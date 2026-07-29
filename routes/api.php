@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ParentUserController;
+use App\Http\Controllers\ParentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +16,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    Route::post('/parents', [ParentUserController::class, 'store']);
+    Route::get('/parents', [ParentController::class, 'index']);
+    Route::post('/parents', [ParentController::class, 'store']);
+    Route::get('/parents/{parentUser}', [ParentController::class, 'show']);
+    Route::put('/parents/{parentUser}', [ParentController::class, 'update']);
+    Route::delete('/parents/{parentUser}', [ParentController::class, 'destroy']);
 });

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->string('phone', 20)->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default(UserRole::PARENT->value);
             $table->timestamps();
@@ -25,7 +24,7 @@ return new class extends Migration
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('token_hash', 64)->unique();
             $table->timestamp('expires_at');
             $table->timestamp('used_at')->nullable();
@@ -47,8 +46,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
+
     }
 };

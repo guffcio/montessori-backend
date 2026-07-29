@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
-class StoreParentRequest extends FormRequest
+class UpdateParentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,8 @@ class StoreParentRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
+            'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->route('parentUser')->user_id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('parentUser')->user_id)],
             'password' => ['required', 'string', 'min:8', 'max:255', Password::defaults()],
             'street' => ['required', 'string', 'max:255'],
             'house_number' => ['required', 'string', 'max:10'],
