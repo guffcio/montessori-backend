@@ -56,7 +56,7 @@ class ParentController extends Controller
     public function show(ParentUser $parentUser): ParentResource
     {
 
-        Gate::authorize('view', ParentUser::class);
+        Gate::authorize('view', $parentUser);
 
         return new ParentResource($parentUser);
     }
@@ -67,7 +67,7 @@ class ParentController extends Controller
     public function update(UpdateParentRequest $request, ParentUser $parentUser): ParentResource
     {
 
-        Gate::authorize('update', ParentUser::class);
+        Gate::authorize('update', $parentUser);
 
         $userDataKeys = ['email', 'phone', 'password'];
         $userData = $request->safe()->only($userDataKeys);
@@ -87,7 +87,7 @@ class ParentController extends Controller
      */
     public function destroy(ParentUser $parentUser)
     {
-        Gate::authorize('delete', ParentUser::class);
+        Gate::authorize('delete', $parentUser);
 
         $parentUser->delete();
 

@@ -3,8 +3,7 @@
 use App\Models\User;
 
 beforeEach(function () {
-    User::factory()->create([
-        'email' => 'user@example.com',
+    $this->user = User::factory()->create([
         'password' => 'password123!',
     ]);
 });
@@ -12,7 +11,7 @@ beforeEach(function () {
 test('user can login', function () {
 
     $response = $this->postJson('/api/login', [
-        'email' => 'user@example.com',
+        'email' => $this->user->email,
         'password' => 'password123!',
     ]);
 
@@ -22,7 +21,7 @@ test('user can login', function () {
 test('login fails with invalid password', function () {
 
     $response = $this->postJson('/api/login', [
-        'email' => 'user@example.com',
+        'email' => $this->user->email,
         'password' => 'password123',
     ]);
 

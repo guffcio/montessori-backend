@@ -4,7 +4,6 @@ use App\Models\User;
 
 test('authenticated user can logout', function () {
     $user = User::factory()->create([
-        'email' => 'user@example.com',
         'password' => 'password123!',
     ]);
 

@@ -4,7 +4,6 @@ use App\Models\User;
 
 test('authenticated user receives own data', function () {
     $user = User::factory()->create([
-        'email' => 'user@example.com',
         'phone' => '+48123456789',
         'password' => 'password123!',
     ]);

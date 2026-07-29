@@ -5,7 +5,6 @@ use App\Models\User;
 
 test('admin can list parents', function () {
     $user = User::factory()->create([
-        'email' => 'admin@example.com',
         'phone' => '+48123456789',
         'password' => 'password123!',
         'role' => 'admin',
@@ -28,7 +27,6 @@ test('admin can list parents', function () {
 
 test('parent cannot list all parents', function () {
     $user = User::factory()->create([
-        'email' => 'parent@example.com',
         'phone' => '+48123456789',
         'password' => 'password123!',
     ]);
