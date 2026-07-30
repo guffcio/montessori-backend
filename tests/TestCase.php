@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\Child;
 use App\Models\ParentUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -29,6 +30,13 @@ abstract class TestCase extends BaseTestCase
         )->create();
 
         return $parent;
+    }
+
+    protected function createChild(): Child
+    {
+        $child = Child::factory()->create();
+
+        return $child;
     }
 
     protected function actingAsAdmin(): User

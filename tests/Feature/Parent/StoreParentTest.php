@@ -83,7 +83,7 @@ test('validation email required', function () {
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonFragment(['The email field is required.']);
+    $response->assertJsonValidationErrors('email');
 });
 
 test('validation email unique', function () {
@@ -102,7 +102,7 @@ test('validation email unique', function () {
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonFragment(['The email has already been taken.']);
+    $response->assertJsonValidationErrors('email');
 });
 
 test('password is hashed', function () {

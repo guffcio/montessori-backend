@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Child;
-use App\Models\ParentUser;
 
 test('admin can update parent', function () {
     $this->actingAsAdmin();
@@ -84,7 +83,7 @@ test('parent cannot update another parent', function () {
 });
 
 test('guest receives 401', function () {
-    $parent = ParentUser::factory()->create();
+    $parent = $this->createParent();
     $response = $this->putJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
@@ -117,7 +116,7 @@ test('validation email unique', function () {
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonFragment(['The email has already been taken.']);
+    $response->assertJsonValidationErrors('email');
 });
 
 test('validation phone unique', function () {
@@ -137,7 +136,7 @@ test('validation phone unique', function () {
     ]);
 
     $response->assertStatus(422);
-    $response->assertJsonFragment(['The phone has already been taken.']);
+    $response->assertJsonValidationErrors('phone');
 });
 
 test('updates user table', function () {
@@ -188,8 +187,9 @@ test('updates parent table', function () {
     ]);
 });
 
-test('parent can replace assigned children', function () {
-    $parent = $this->actingAsParent();
+test('admin can replace assigned children', function () {
+    $this->actingAsAdmin();
+    $parent = $this->createParent();
 
     $children = Child::factory()->count(5)->create();
     $childrenIds = $children->pluck('id');
@@ -230,8 +230,10 @@ test('parent can replace assigned children', function () {
 
 });
 
-test('parent cannot assign non existing children', function () {
-    $parent = $this->actingAsParent();
+test('admin cannot assign non existing children', function () {
+    $this->actingAsAdmin();
+
+    $parent = $this->createParent();
 
     $children = Child::factory()->count(5)->create();
     $childrenIds = $children->pluck('id');
