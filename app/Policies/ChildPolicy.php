@@ -50,7 +50,7 @@ class ChildPolicy
      */
     public function update(User $user, Child $child): bool
     {
-        return false;
+        return $this->ownsChild($user, $child);
     }
 
     /**
