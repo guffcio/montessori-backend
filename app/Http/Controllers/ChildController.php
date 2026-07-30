@@ -6,6 +6,7 @@ use App\Http\Requests\ChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ChildController extends Controller
@@ -38,8 +39,16 @@ class ChildController extends Controller
 
         Gate::authorize('create', Child::class);
 
-        $data = $request->validated();
-        $child = Child::create($data);
+        $data = $request->safe()->except('parents');
+        $parents = $request->safe()->input('parents');
+
+        $child = DB::transaction(function () use ($data, $parents) {
+            $child = Child::create($data);
+
+            $child->parents()->sync($parents);
+
+            return $child;
+        });
 
         return new ChildResource($child);
     }
@@ -62,7 +71,16 @@ class ChildController extends Controller
 
         Gate::authorize('update', $child);
 
-        $child->update($request->validated());
+        $data = $request->safe()->except('parents');
+        $parents = $request->safe()->input('parents');
+
+        $child = DB::transaction(function () use ($child, $data, $parents) {
+            $child->update($data);
+
+            $child->parents()->sync($parents);
+
+            return $child;
+        });
 
         return new ChildResource($child);
     }

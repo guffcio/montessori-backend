@@ -2,11 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ParentUser;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * @property ParentUser $parentUser
+ */
 class UpdateParentRequest extends FormRequest
 {
     /**
@@ -27,8 +31,8 @@ class UpdateParentRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->route('parentUser')->user_id)],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('parentUser')->user_id)],
+            'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->parentUser->user_id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->parentUser->user_id)],
             'password' => ['nullable', 'string', 'min:8', 'max:255', Password::defaults()],
             'street' => ['required', 'string', 'max:255'],
             'house_number' => ['required', 'string', 'max:10'],

@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Child;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property Child $child
+ */
 class ChildRequest extends FormRequest
 {
     /**
@@ -32,6 +36,8 @@ class ChildRequest extends FormRequest
             'pesel' => ['required', 'string', 'digits:11', Rule::unique('children', 'pesel')->ignore($this->child)],
             'started_at' => ['required', 'date'],
             'preschool_started_at' => ['nullable', 'date'],
+            'parents' => ['nullable', 'array'],
+            'parents.*' => ['integer', Rule::exists('parents', 'id')],
         ];
     }
 }
