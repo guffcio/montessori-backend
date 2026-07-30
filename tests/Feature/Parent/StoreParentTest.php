@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Child;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -149,4 +150,59 @@ test('user and parent are created', function () {
         'house_number' => '18',
         'postal_code' => '20100',
     ]);
+});
+
+test('admin can assign existing children when creating parent', function () {
+    $this->actingAsAdmin();
+
+    $children = Child::factory()->count(5)->create();
+    $childrenIds = $children->pluck('id');
+
+    $response = $this->postJson('/api/parents', [
+        'first_name' => 'John',
+        'last_name' => 'Smith',
+        'email' => 'parent@example.com',
+        'phone' => '+48777666555',
+        'password' => 'password123',
+        'street' => 'Polyville Street',
+        'house_number' => '18',
+        'postal_code' => '20100',
+        'city' => 'London',
+        'children' => $childrenIds,
+    ]);
+
+    $response->assertStatus(201);
+
+    foreach ($childrenIds as $childId) {
+        $this->assertDatabaseHas('parent_child', [
+            'parent_id' => $response['data']['id'],
+            'child_id' => $childId,
+        ]);
+    }
+
+    $this->assertDatabaseCount('parent_child', 5);
+
+});
+
+test('admin cannot assign non existing children when creating parent', function () {
+    $this->actingAsAdmin();
+
+    $childrenIds = [1, 2, 3, 4, 5];
+
+    $response = $this->postJson('/api/parents', [
+        'first_name' => 'John',
+        'last_name' => 'Smith',
+        'email' => 'parent@example.com',
+        'phone' => '+48777666555',
+        'password' => 'password123',
+        'street' => 'Polyville Street',
+        'house_number' => '18',
+        'postal_code' => '20100',
+        'city' => 'London',
+        'children' => $childrenIds,
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('children.0');
+    $this->assertDatabaseCount('parent_child', 0);
 });

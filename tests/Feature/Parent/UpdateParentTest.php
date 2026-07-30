@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Child;
 use App\Models\ParentUser;
 
 test('admin can update parent', function () {
@@ -185,4 +186,72 @@ test('updates parent table', function () {
         'postal_code' => '20100',
         'city' => 'London',
     ]);
+});
+
+test('parent can replace assigned children', function () {
+    $parent = $this->actingAsParent();
+
+    $children = Child::factory()->count(5)->create();
+    $childrenIds = $children->pluck('id');
+    $parent->children()->sync($childrenIds);
+
+    $newChildren = Child::factory()->count(3)->create();
+    $newChildrenIds = $newChildren->pluck('id');
+
+    $response = $this->putJson("/api/parents/{$parent->id}", [
+        'first_name' => 'John',
+        'last_name' => 'Smith',
+        'email' => 'parent@example.com',
+        'phone' => '+48777666555',
+        'street' => 'Polyville Street',
+        'house_number' => '18',
+        'postal_code' => '20100',
+        'city' => 'London',
+        'children' => $newChildrenIds,
+    ]);
+
+    $response->assertStatus(200);
+
+    foreach ($newChildrenIds as $childId) {
+        $this->assertDatabaseHas('parent_child', [
+            'parent_id' => $parent->id,
+            'child_id' => $childId,
+        ]);
+    }
+
+    foreach ($childrenIds as $childId) {
+        $this->assertDatabaseMissing('parent_child', [
+            'parent_id' => $parent->id,
+            'child_id' => $childId,
+        ]);
+    }
+
+    $this->assertDatabaseCount('parent_child', 3);
+
+});
+
+test('parent cannot assign non existing children', function () {
+    $parent = $this->actingAsParent();
+
+    $children = Child::factory()->count(5)->create();
+    $childrenIds = $children->pluck('id');
+    $parent->children()->sync($childrenIds);
+
+    $newChildrenIds = [999, 1000, 1001];
+
+    $response = $this->putJson("/api/parents/{$parent->id}", [
+        'first_name' => 'John',
+        'last_name' => 'Smith',
+        'email' => 'parent@example.com',
+        'phone' => '+48777666555',
+        'street' => 'Polyville Street',
+        'house_number' => '18',
+        'postal_code' => '20100',
+        'city' => 'London',
+        'children' => $newChildrenIds,
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('children.0');
+    $this->assertDatabaseCount('parent_child', 5);
 });

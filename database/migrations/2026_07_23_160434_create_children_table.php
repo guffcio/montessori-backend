@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Zone::class)->constrained()->onDelete('cascade');
             $table->string('pesel', 11);
             $table->date('started_at');
-            $table->date('preschool_started_at');
+            $table->date('preschool_started_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

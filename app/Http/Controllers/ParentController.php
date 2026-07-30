@@ -34,17 +34,22 @@ class ParentController extends Controller
         $userDataKeys = ['email', 'phone', 'password'];
 
         $userData = $request->safe()->only($userDataKeys);
-        $parentData = $request->safe()->except($userDataKeys);
+        $parentData = $request->safe()->except([...$userDataKeys, 'children']);
+        $children = $request->safe()->input('children', []);
 
         $userData['password'] = Hash::make($userData['password']);
 
-        $parent = DB::transaction(function () use ($userData, $parentData) {
+        $parent = DB::transaction(function () use ($userData, $parentData, $children) {
             $user = User::create($userData);
 
-            return ParentUser::create([
+            $parent = ParentUser::create([
                 ...$parentData,
                 'user_id' => $user->id,
             ]);
+
+            $parent->children()->sync($children);
+
+            return $parent;
         });
 
         return new ParentResource($parent);
@@ -71,11 +76,21 @@ class ParentController extends Controller
 
         $userDataKeys = ['email', 'phone', 'password'];
         $userData = $request->safe()->only($userDataKeys);
-        $parentData = $request->safe()->except($userDataKeys);
+        $parentData = $request->safe()->except([...$userDataKeys, 'children']);
+        $children = $request->safe()->input('children', []);
 
-        DB::transaction(function () use ($parentUser, $userData, $parentData) {
+        if (! empty($userData['password'])) {
+            $userData['password'] = Hash::make($userData['password']);
+        } else {
+            unset($userData['password']);
+        }
+
+        $parentUser = DB::transaction(function () use ($parentUser, $userData, $parentData, $children) {
             $parentUser->update($parentData);
             $parentUser->user()->update($userData);
+            $parentUser->children()->sync($children);
+
+            return $parentUser;
         });
 
         return new ParentResource($parentUser);
