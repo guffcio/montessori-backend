@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->date('birth_date');
             $table->foreignIdFor(Zone::class)->constrained()->onDelete('cascade');
-            $table->string('pesel', 11);
+            $table->string('pesel', 11)->unique();
             $table->date('started_at');
             $table->date('preschool_started_at')->nullable();
             $table->softDeletes();

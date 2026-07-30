@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChildController;
 use App\Http\Controllers\ParentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +22,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/parents/{parentUser}', [ParentController::class, 'show']);
     Route::put('/parents/{parentUser}', [ParentController::class, 'update']);
     Route::delete('/parents/{parentUser}', [ParentController::class, 'destroy']);
+
+    Route::get('/children', [ChildController::class, 'index']);
+    Route::post('/children', [ChildController::class, 'store']);
+    Route::get('/children/{child}', [ChildController::class, 'show']);
+    Route::put('/children/{child}', [ChildController::class, 'update']);
+    Route::delete('/children/{child}', [ChildController::class, 'destroy']);
 });
