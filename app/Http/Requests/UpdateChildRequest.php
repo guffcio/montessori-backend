@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 /**
  * @property Child $child
  */
-class ChildRequest extends FormRequest
+class UpdateChildRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

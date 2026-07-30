@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ChildRequest;
+use App\Http\Requests\StoreChildRequest;
+use App\Http\Requests\UpdateChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +35,7 @@ class ChildController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ChildRequest $request): ChildResource
+    public function store(StoreChildRequest $request): ChildResource
     {
 
         Gate::authorize('create', Child::class);
@@ -66,7 +67,7 @@ class ChildController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ChildRequest $request, Child $child): ChildResource
+    public function update(UpdateChildRequest $request, Child $child): ChildResource
     {
 
         Gate::authorize('update', $child);
