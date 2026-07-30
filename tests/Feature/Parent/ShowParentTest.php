@@ -1,73 +1,35 @@
 <?php
 
 use App\Models\ParentUser;
-use App\Models\User;
 
 test('admin can view parent', function () {
-    $user = User::factory()->create([
-        'password' => 'password123@',
-        'role' => 'admin',
-    ]);
+    $this->actingAsAdmin();
 
-    $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'password123@',
-    ]);
+    $parent = $this->createParent();
 
-    $token = $loginResponse['access_token'];
-
-    $parent = ParentUser::factory()->create();
-
-    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/parents/{$parent->id}");
+    $response = $this->getJson("/api/parents/{$parent->id}");
     $response->assertStatus(200);
 
 });
 test('owner can view own parent', function () {
-    $user = User::factory()->create([
-        'password' => 'parent123@',
-    ]);
+    $parent = $this->actingAsParent();
 
-    $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'parent123@',
-    ]);
-
-    $token = $loginResponse['access_token'];
-
-    $parent = ParentUser::factory()->create([
-        'user_id' => $user->id,
-    ]);
-
-    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/parents/{$parent->id}");
+    $response = $this->getJson("/api/parents/{$parent->id}");
 
     $response->assertStatus(200);
     $response->assertJson([
         'data' => [
-            'user_id' => $user->id,
+            'user_id' => $parent->user->id,
             'id' => $parent->id,
         ],
     ]);
 
 });
 test('parent cannot view another parent', function () {
-    $user = User::factory()->create([
-        'password' => 'parent123@',
-    ]);
+    $this->actingAsParent();
+    $secondParent = $this->createParent();
 
-    $secondUser = User::factory()->create();
-
-    $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'parent123@',
-    ]);
-
-    $token = $loginResponse['access_token'];
-
-    $parent = ParentUser::factory()->create([
-        'user_id' => $secondUser->id,
-    ]);
-
-    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/parents/{$parent->id}");
+    $response = $this->getJson("/api/parents/{$secondParent->id}");
 
     $response->assertStatus(403);
 });
@@ -76,19 +38,10 @@ test('guest receives 401', function () {
     $response->assertStatus(401);
 });
 test('return 404 for missing parent', function () {
-    $user = User::factory()->create([
-        'password' => 'password123@',
-        'role' => 'admin',
-    ]);
+    $this->actingAsAdmin();
 
-    $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'password123@',
-    ]);
-
-    $token = $loginResponse['access_token'];
     $missingId = ParentUser::max('id') + 1;
 
-    $response = $this->withHeader('Authorization', "Bearer {$token}")->getJson("/api/parents/{$missingId}");
+    $response = $this->getJson("/api/parents/{$missingId}");
     $response->assertStatus(404);
 });

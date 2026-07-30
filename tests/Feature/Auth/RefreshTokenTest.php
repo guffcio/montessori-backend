@@ -1,16 +1,10 @@
 <?php
 
-use App\Models\User;
-
 test('authenticated user can refresh token', function () {
-    $user = User::factory()->create([
-        'phone' => '+48123456789',
-        'password' => 'password123!',
-    ]);
 
     $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'password123!',
+        'email' => $this->createParent()->user->email,
+        'password' => $this->defaultPassword,
     ]);
 
     $token = $loginResponse['access_token'];

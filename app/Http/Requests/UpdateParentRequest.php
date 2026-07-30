@@ -29,7 +29,7 @@ class UpdateParentRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->route('parentUser')->user_id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('parentUser')->user_id)],
-            'password' => ['required', 'string', 'min:8', 'max:255', Password::defaults()],
+            'password' => ['nullable', 'string', 'min:8', 'max:255', Password::defaults()],
             'street' => ['required', 'string', 'max:255'],
             'house_number' => ['required', 'string', 'max:10'],
             'apartment_number' => ['nullable', 'string', 'max:10'],

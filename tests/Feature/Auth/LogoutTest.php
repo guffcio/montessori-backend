@@ -1,15 +1,9 @@
 <?php
 
-use App\Models\User;
-
 test('authenticated user can logout', function () {
-    $user = User::factory()->create([
-        'password' => 'password123!',
-    ]);
-
     $loginResponse = $this->postJson('/api/login', [
-        'email' => $user->email,
-        'password' => 'password123!',
+        'email' => $this->createParent()->user->email,
+        'password' => $this->defaultPassword,
     ]);
 
     $token = $loginResponse['access_token'];

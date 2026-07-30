@@ -23,8 +23,8 @@ class ParentUserFactory extends Factory
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'street' => fake()->streetAddress(),
-            'house_number' => fake()->randomNumber(),
-            'apartment_number' => fake()->randomNumber(),
+            'house_number' => fake()->buildingNumber(),
+            'apartment_number' => fake()->buildingNumber(),
             'postal_code' => fake()->postcode(),
             'city' => fake()->city(),
         ];

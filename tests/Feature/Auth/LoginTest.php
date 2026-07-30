@@ -1,18 +1,10 @@
 <?php
 
-use App\Models\User;
-
-beforeEach(function () {
-    $this->user = User::factory()->create([
-        'password' => 'password123!',
-    ]);
-});
-
 test('user can login', function () {
 
     $response = $this->postJson('/api/login', [
-        'email' => $this->user->email,
-        'password' => 'password123!',
+        'email' => $this->createParent()->user->email,
+        'password' => $this->defaultPassword,
     ]);
 
     $response->assertStatus(200);
@@ -21,8 +13,8 @@ test('user can login', function () {
 test('login fails with invalid password', function () {
 
     $response = $this->postJson('/api/login', [
-        'email' => $this->user->email,
-        'password' => 'password123',
+        'email' => $this->createParent()->user->email,
+        'password' => 'password123!',
     ]);
 
     $response->assertStatus(401);
