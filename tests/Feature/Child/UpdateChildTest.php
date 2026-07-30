@@ -29,7 +29,7 @@ test('admin can update child', function () {
     ]);
 });
 
-test('parent can update own child', function () {
+test('parent cannot update own child', function () {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -44,17 +44,8 @@ test('parent can update own child', function () {
         'started_at' => '2026-07-30',
     ]);
 
-    $response->assertStatus(200);
-    $response->assertJson([
-        'data' => [
-            'first_name' => 'Leo',
-            'last_name' => 'Smith',
-            'birth_date' => '2023-05-24',
-            'zone_id' => $child->zone->id,
-            'pesel' => '11111111111',
-            'started_at' => '2026-07-30',
-        ],
-    ]);
+    $response->assertStatus(403);
+    $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
 test('parent cannot update another child', function () {
