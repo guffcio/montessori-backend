@@ -4,12 +4,13 @@ namespace App\Policies;
 
 use App\Models\ParentUser;
 use App\Models\User;
+use App\UserRole;
 
 class ParentPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->role === 'admin') {
+        if ($user->role === UserRole::ADMIN) {
             return true;
         }
 

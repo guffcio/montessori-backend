@@ -1,13 +1,14 @@
 <?php
 
 use App\Models\ParentUser;
+use App\Models\Zone;
 
 test('admin can update child', function () {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -35,13 +36,11 @@ test('parent can update own child', function () {
 
     $child->parents()->sync($parent->id);
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
-        'zone_id' => $child->zone->id,
         'pesel' => '11111111111',
-        'started_at' => '2026-07-30',
     ]);
 
     $response->assertStatus(200);
@@ -50,9 +49,9 @@ test('parent can update own child', function () {
             'first_name' => 'Leo',
             'last_name' => 'Smith',
             'birth_date' => '2023-05-24',
-            'zone_id' => $child->zone->id,
             'pesel' => '11111111111',
-            'started_at' => '2026-07-30',
+            'zone_id' => $child->zone->id,
+            'started_at' => $child->started_at,
         ],
     ]);
 });
@@ -67,7 +66,7 @@ test('parent cannot update another child', function () {
     $child->parents()->sync($parent);
     $otherChild->parents()->sync($secondParent);
 
-    $response = $this->putJson("/api/children/{$otherChild->id}", [
+    $response = $this->patchJson("/api/children/{$otherChild->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -82,7 +81,7 @@ test('parent cannot update another child', function () {
 
 test('guest receives 401', function () {
     $child = $this->createChild();
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -100,7 +99,7 @@ test('updates children table', function () {
 
     $child = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -134,7 +133,7 @@ test('admin can replace assigned parents', function () {
     $newParents = ParentUser::factory()->count(3)->create();
     $newParentIds = $newParents->pluck('id');
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'id' => $child->id,
         'first_name' => 'Leo',
         'last_name' => 'Smith',
@@ -177,7 +176,7 @@ test('admin cannot assign non existing parents', function () {
 
     $newParentIds = [999, 1000, 1001];
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'id' => $child->id,
         'first_name' => 'Leo',
         'last_name' => 'Smith',
@@ -203,7 +202,7 @@ test('admin can remove all parents', function () {
 
     $child->parents()->sync($parentIds);
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'id' => $child->id,
         'first_name' => 'Leo',
         'last_name' => 'Smith',
@@ -226,22 +225,44 @@ test('admin can remove all parents', function () {
     $this->assertDatabaseCount('parent_child', 0);
 });
 
-test('required fields are validated', function () {
-    $this->actingAsAdmin();
+test('parent can update only strict fields', function () {
+    $parent = $this->actingAsParent();
 
     $child = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", []);
+    $child->parents()->sync($parent->id);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors([
-        'first_name',
-        'last_name',
-        'birth_date',
-        'zone_id',
-        'pesel',
-        'started_at',
+    $zone = Zone::factory()->create();
+
+    $response = $this->patchJson("/api/children/{$child->id}", [
+        'id' => $child->id,
+        'first_name' => 'Leo',
+        'last_name' => 'Smith',
+        'birth_date' => '2023-05-24',
+        'zone_id' => $zone->id,
+        'pesel' => '11111111111',
+        'started_at' => '2026-07-30',
+        'parents' => [],
     ]);
+
+    $response->assertStatus(200);
+
+    $this->assertDatabaseHas('children', [
+        'id' => $child->id,
+        'first_name' => 'Leo',
+        'last_name' => 'Smith',
+        'birth_date' => '2023-05-24',
+        'zone_id' => $child->zone->id,
+        'pesel' => '11111111111',
+        'started_at' => $child->started_at,
+    ]);
+
+    $this->assertDatabaseHas('parent_child', [
+        'parent_id' => $parent->id,
+        'child_id' => $child->id,
+    ]);
+
+    $this->assertDatabaseCount('parent_child', 1);
 });
 
 test('child can keep current pesel', function () {
@@ -249,7 +270,7 @@ test('child can keep current pesel', function () {
 
     $child = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -267,7 +288,7 @@ test('child cannot use another child pesel', function () {
     $child = $this->createChild();
     $otherChild = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
@@ -284,7 +305,7 @@ test('zone must exist', function () {
     $this->actingAsAdmin();
     $child = $this->createChild();
 
-    $response = $this->putJson("/api/children/{$child->id}", [
+    $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',

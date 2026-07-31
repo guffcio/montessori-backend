@@ -29,12 +29,12 @@ class UpdateChildRequest extends FormRequest
     {
 
         return [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'birth_date' => ['required', 'date'],
-            'zone_id' => ['required', 'integer', Rule::exists('zones', 'id')],
-            'pesel' => ['required', 'string', 'digits:11', Rule::unique('children', 'pesel')->ignore($this->child)],
-            'started_at' => ['required', 'date'],
+            'first_name' => ['sometimes', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
+            'birth_date' => ['sometimes', 'date'],
+            'zone_id' => ['sometimes', 'integer', Rule::exists('zones', 'id')],
+            'pesel' => ['sometimes', 'string', 'digits:11', Rule::unique('children', 'pesel')->ignore($this->child)],
+            'started_at' => ['sometimes', 'date'],
             'preschool_started_at' => ['nullable', 'date'],
             'parents' => ['nullable', 'array'],
             'parents.*' => ['integer', Rule::exists('parents', 'id')],

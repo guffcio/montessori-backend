@@ -26,6 +26,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/children', [ChildController::class, 'index']);
     Route::post('/children', [ChildController::class, 'store']);
     Route::get('/children/{child}', [ChildController::class, 'show']);
-    Route::put('/children/{child}', [ChildController::class, 'update']);
+    Route::patch('/children/{child}', [ChildController::class, 'update']);
     Route::delete('/children/{child}', [ChildController::class, 'destroy']);
 });

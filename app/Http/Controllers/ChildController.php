@@ -6,6 +6,7 @@ use App\Http\Requests\StoreChildRequest;
 use App\Http\Requests\UpdateChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
+use App\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -69,21 +70,31 @@ class ChildController extends Controller
      */
     public function update(UpdateChildRequest $request, Child $child): ChildResource
     {
-
         Gate::authorize('update', $child);
 
-        $data = $request->safe()->except('parents');
-        $parents = $request->safe()->input('parents');
+        $isAdmin = Auth::user()->role === UserRole::ADMIN;
 
-        $child = DB::transaction(function () use ($child, $data, $parents) {
+        $data = $isAdmin
+            ? $request->safe()->except('parents')
+            : $request->safe()->only([
+                'first_name',
+                'last_name',
+                'birth_date',
+                'pesel',
+            ]);
+
+        DB::transaction(function () use ($child, $data, $request, $isAdmin) {
+
             $child->update($data);
 
-            $child->parents()->sync($parents);
-
-            return $child;
+            if ($isAdmin) {
+                $child->parents()->sync(
+                    $request->validated('parents', [])
+                );
+            }
         });
 
-        return new ChildResource($child);
+        return new ChildResource($child->fresh());
     }
 
     /**
