@@ -29,16 +29,16 @@ class UpdateParentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->parentUser->user_id)],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->parentUser->user_id)],
-            'password' => ['nullable', 'string', 'min:8', 'max:255', Password::defaults()],
-            'street' => ['required', 'string', 'max:255'],
-            'house_number' => ['required', 'string', 'max:10'],
+            'first_name' => ['sometimes', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
+            'phone' => ['sometimes', 'string', 'max:20', 'phone:PL', Rule::unique('users', 'phone')->ignore($this->parentUser->user_id)],
+            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->parentUser->user_id)],
+            'password' => ['sometimes', 'string', 'min:8', 'max:255', Password::defaults()],
+            'street' => ['sometimes', 'string', 'max:255'],
+            'house_number' => ['sometimes', 'string', 'max:10'],
             'apartment_number' => ['nullable', 'string', 'max:10'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:10'],
+            'city' => ['sometimes', 'string', 'max:255'],
+            'postal_code' => ['sometimes', 'string', 'max:10'],
             'children' => ['nullable', 'array'],
             'children.*' => ['integer', Rule::exists('children', 'id')],
         ];

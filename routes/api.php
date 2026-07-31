@@ -20,7 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/parents', [ParentController::class, 'index']);
     Route::post('/parents', [ParentController::class, 'store']);
     Route::get('/parents/{parentUser}', [ParentController::class, 'show']);
-    Route::put('/parents/{parentUser}', [ParentController::class, 'update']);
+    Route::patch('/parents/{parentUser}', [ParentController::class, 'update']);
     Route::delete('/parents/{parentUser}', [ParentController::class, 'destroy']);
 
     Route::get('/children', [ChildController::class, 'index']);

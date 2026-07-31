@@ -7,6 +7,8 @@ use App\Http\Requests\UpdateParentRequest;
 use App\Http\Resources\ParentResource;
 use App\Models\ParentUser;
 use App\Models\User;
+use App\UserRole;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -74,10 +76,11 @@ class ParentController extends Controller
 
         Gate::authorize('update', $parentUser);
 
+        $isAdmin = Auth::user()->role === UserRole::ADMIN;
+
         $userDataKeys = ['email', 'phone', 'password'];
         $userData = $request->safe()->only($userDataKeys);
         $parentData = $request->safe()->except([...$userDataKeys, 'children']);
-        $children = $request->safe()->input('children', []);
 
         if (! empty($userData['password'])) {
             $userData['password'] = Hash::make($userData['password']);
@@ -85,10 +88,13 @@ class ParentController extends Controller
             unset($userData['password']);
         }
 
-        $parentUser = DB::transaction(function () use ($parentUser, $userData, $parentData, $children) {
+        $parentUser = DB::transaction(function () use ($parentUser, $userData, $parentData, $request, $isAdmin) {
             $parentUser->update($parentData);
             $parentUser->user()->update($userData);
-            $parentUser->children()->sync($children);
+
+            if ($isAdmin) {
+                $parentUser->children()->sync($request->validated('children', []));
+            }
 
             return $parentUser;
         });

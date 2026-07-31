@@ -27,7 +27,7 @@ class ChildPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'parent';
+        return $user->role === UserRole::PARENT;
     }
 
     /**

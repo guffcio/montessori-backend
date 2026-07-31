@@ -7,7 +7,7 @@ test('admin can update parent', function () {
 
     $parent = $this->createParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -36,7 +36,7 @@ test('admin can update parent', function () {
 test('owner can update own data', function () {
     $parent = $this->actingAsParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -67,7 +67,7 @@ test('parent cannot update another parent', function () {
 
     $secondParent = $this->createParent();
 
-    $response = $this->putJson("/api/parents/{$secondParent->id}", [
+    $response = $this->patchJson("/api/parents/{$secondParent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -84,7 +84,7 @@ test('parent cannot update another parent', function () {
 
 test('guest receives 401', function () {
     $parent = $this->createParent();
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -104,7 +104,7 @@ test('validation email unique', function () {
 
     $secondParent = $this->createParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => $secondParent->user->email,
@@ -124,7 +124,7 @@ test('validation phone unique', function () {
 
     $secondParent = $this->createParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => $parent->user->email,
@@ -142,7 +142,7 @@ test('validation phone unique', function () {
 test('updates user table', function () {
     $parent = $this->actingAsParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => $parent->first_name,
         'last_name' => $parent->last_name,
         'email' => 'parent@example.com',
@@ -164,7 +164,7 @@ test('updates user table', function () {
 test('updates parent table', function () {
     $parent = $this->actingAsParent();
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => $parent->user->email,
@@ -198,7 +198,7 @@ test('admin can replace assigned children', function () {
     $newChildren = Child::factory()->count(3)->create();
     $newChildrenIds = $newChildren->pluck('id');
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -241,7 +241,7 @@ test('admin cannot assign non existing children', function () {
 
     $newChildrenIds = [999, 1000, 1001];
 
-    $response = $this->putJson("/api/parents/{$parent->id}", [
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
         'last_name' => 'Smith',
         'email' => 'parent@example.com',
@@ -256,4 +256,18 @@ test('admin cannot assign non existing children', function () {
     $response->assertStatus(422);
     $response->assertJsonValidationErrors('children.0');
     $this->assertDatabaseCount('parent_child', 5);
+});
+
+test('parent cannot assign children', function () {
+    $parent = $this->actingAsParent();
+
+    $children = Child::factory()->count(5)->create();
+    $childrenIds = $children->pluck('id');
+
+    $response = $this->patchJson("/api/parents/{$parent->id}", [
+        'children' => $childrenIds,
+    ]);
+
+    $response->assertStatus(200);
+    $this->assertDatabaseCount('parent_child', 0);
 });
