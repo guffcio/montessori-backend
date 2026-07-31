@@ -23,7 +23,7 @@ class ChildController extends Controller
 
         $user = Auth::user();
 
-        if ($user->parent) {
+        if ($user->role === UserRole::PARENT) {
             $children = $user->parent->children()->get();
 
         } else {

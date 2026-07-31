@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\Absence;
 use App\Models\Child;
 use App\Models\ParentUser;
 use App\Models\User;
@@ -37,6 +38,14 @@ abstract class TestCase extends BaseTestCase
         $child = Child::factory()->create();
 
         return $child;
+    }
+
+    protected function createAbsence($data = []): Absence
+    {
+
+        $absence = Absence::factory()->create($data);
+
+        return $absence;
     }
 
     protected function actingAsAdmin(): User

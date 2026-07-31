@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Child::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class, 'reported_by_user_id')->constrained()->onDelete('cascade');
             $table->boolean('charge_catering');
-            $table->timestamp('absent_at');
+            $table->date('absent_at');
             $table->timestamps();
         });
     }

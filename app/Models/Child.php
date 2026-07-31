@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['first_name', 'last_name', 'birth_date', 'zone_id', 'pesel', 'started_at', 'preschool_started_at'])]
@@ -37,8 +38,8 @@ class Child extends Model
         return $this->belongsToMany(Invoice::class);
     }
 
-    public function absences(): BelongsToMany
+    public function absences(): HasMany
     {
-        return $this->belongsToMany(Absence::class);
+        return $this->hasMany(Absence::class);
     }
 }

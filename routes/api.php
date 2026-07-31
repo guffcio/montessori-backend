@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\ParentController;
@@ -28,4 +29,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/children/{child}', [ChildController::class, 'show']);
     Route::patch('/children/{child}', [ChildController::class, 'update']);
     Route::delete('/children/{child}', [ChildController::class, 'destroy']);
+
+    Route::get('/absences', [AbsenceController::class, 'index']);
+    Route::post('/absences', [AbsenceController::class, 'store']);
+    Route::get('/absences/{absence}', [AbsenceController::class, 'show']);
+    Route::patch('/absences/{absence}', [AbsenceController::class, 'update']);
+    Route::delete('/absences/{absence}', [AbsenceController::class, 'destroy']);
 });
