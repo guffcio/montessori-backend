@@ -43,11 +43,14 @@ class ChildController extends Controller
 
         $data = $request->safe()->except('parents');
         $parents = $request->safe()->input('parents');
+        $allergens = $request->safe()->input('allergens');
 
-        $child = DB::transaction(function () use ($data, $parents) {
+        $child = DB::transaction(function () use ($data, $parents, $allergens) {
             $child = Child::create($data);
 
             $child->parents()->sync($parents);
+
+            $child->allergens()->sync($allergens);
 
             return $child;
         });
@@ -92,6 +95,8 @@ class ChildController extends Controller
                     $request->validated('parents', [])
                 );
             }
+
+            $child->allergens()->sync($request->validated('allergens', []));
         });
 
         return new ChildResource($child->fresh());

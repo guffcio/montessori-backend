@@ -38,6 +38,8 @@ class UpdateChildRequest extends FormRequest
             'preschool_started_at' => ['nullable', 'date'],
             'parents' => ['nullable', 'array'],
             'parents.*' => ['integer', Rule::exists('parents', 'id')],
+            'allergens' => ['nullable', 'array'],
+            'allergens.*' => ['integer', Rule::exists('allergens', 'id')],
         ];
     }
 }

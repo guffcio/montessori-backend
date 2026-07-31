@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Allergen;
 use App\Models\ParentUser;
 use App\Models\Zone;
 
@@ -225,6 +226,109 @@ test('admin can remove all parents', function () {
     $this->assertDatabaseCount('parent_child', 0);
 });
 
+test('parent can replace assigned allergens', function () {
+    $parent = $this->actingAsParent();
+
+    $child = $this->createChild();
+    $child->parents()->sync($parent);
+
+    $allergens = Allergen::factory()->count(5)->create();
+    $allergenIds = $allergens->pluck('id');
+
+    $newAllergens = Allergen::factory()->count(3)->create();
+    $newAllergensIds = $newAllergens->pluck('id');
+
+    $response = $this->patchJson("/api/children/{$child->id}", [
+        'id' => $child->id,
+        'first_name' => 'Leo',
+        'last_name' => 'Smith',
+        'birth_date' => '2023-05-24',
+        'zone_id' => $child->zone->id,
+        'pesel' => '11111111111',
+        'started_at' => '2026-07-30',
+        'allergens' => $newAllergensIds,
+    ]);
+
+    $response->assertStatus(200);
+
+    foreach ($newAllergensIds as $allergenId) {
+        $this->assertDatabaseHas('allergen_child', [
+            'allergen_id' => $allergenId,
+            'child_id' => $child->id,
+        ]);
+    }
+
+    foreach ($allergenIds as $allergenId) {
+        $this->assertDatabaseMissing('allergen_child', [
+            'allergen_id' => $allergenId,
+            'child_id' => $child->id,
+        ]);
+    }
+
+    $this->assertDatabaseCount('allergen_child', 3);
+
+});
+
+test('parent cannot assign non existing allergens', function () {
+    $parent = $this->actingAsParent();
+
+    $child = $this->createChild();
+    $child->parents()->sync($parent);
+
+    $allergens = Allergen::factory()->count(5)->create();
+    $child->allergens()->sync($allergens);
+
+    $newAllergensIds = [999, 1000, 1001];
+
+    $response = $this->patchJson("/api/children/{$child->id}", [
+        'id' => $child->id,
+        'first_name' => 'Leo',
+        'last_name' => 'Smith',
+        'birth_date' => '2023-05-24',
+        'zone_id' => $child->zone->id,
+        'pesel' => '11111111111',
+        'started_at' => '2026-07-30',
+        'allergens' => $newAllergensIds,
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('allergens.0');
+    $this->assertDatabaseCount('allergen_child', 5);
+});
+
+test('parent can remove all allergens', function () {
+    $parent = $this->actingAsParent();
+
+    $child = $this->createChild();
+    $child->parents()->sync($parent);
+
+    $allergens = Allergen::factory()->count(5)->create();
+    $allergenIds = $allergens->pluck('id');
+    $child->allergens()->sync($allergens);
+
+    $response = $this->patchJson("/api/children/{$child->id}", [
+        'id' => $child->id,
+        'first_name' => 'Leo',
+        'last_name' => 'Smith',
+        'birth_date' => '2023-05-24',
+        'zone_id' => $child->zone->id,
+        'pesel' => '11111111111',
+        'started_at' => '2026-07-30',
+        'allergens' => [],
+    ]);
+
+    $response->assertStatus(200);
+
+    foreach ($allergenIds as $allergenId) {
+        $this->assertDatabaseMissing('allergen_child', [
+            'allergen_id' => $allergenId,
+            'child_id' => $child->id,
+        ]);
+    }
+
+    $this->assertDatabaseCount('allergen_child', 0);
+});
+
 test('parent can update only strict fields', function () {
     $parent = $this->actingAsParent();
 
@@ -232,6 +336,8 @@ test('parent can update only strict fields', function () {
 
     $child->parents()->sync($parent->id);
 
+    $allergens = Allergen::factory()->count(5)->create();
+    $allergenIds = $allergens->pluck('id');
     $zone = Zone::factory()->create();
 
     $response = $this->patchJson("/api/children/{$child->id}", [
@@ -243,6 +349,7 @@ test('parent can update only strict fields', function () {
         'pesel' => '11111111111',
         'started_at' => '2026-07-30',
         'parents' => [],
+        'allergens' => $allergenIds,
     ]);
 
     $response->assertStatus(200);
@@ -257,12 +364,22 @@ test('parent can update only strict fields', function () {
         'started_at' => $child->started_at,
     ]);
 
+    $this->assertDatabaseCount('parent_child', 1);
+
     $this->assertDatabaseHas('parent_child', [
         'parent_id' => $parent->id,
         'child_id' => $child->id,
     ]);
 
-    $this->assertDatabaseCount('parent_child', 1);
+    foreach ($allergenIds as $allergenId) {
+        $this->assertDatabaseHas('allergen_child', [
+            'child_id' => $response->json('data.id'),
+            'allergen_id' => $allergenId,
+        ]);
+    }
+
+    $this->assertDatabaseCount('allergen_child', 5);
+
 });
 
 test('child can keep current pesel', function () {
