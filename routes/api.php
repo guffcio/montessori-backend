@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ParentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,4 +36,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/absences/{absence}', [AbsenceController::class, 'show']);
     Route::patch('/absences/{absence}', [AbsenceController::class, 'update']);
     Route::delete('/absences/{absence}', [AbsenceController::class, 'destroy']);
+
+    Route::get('/menus', [MenuController::class, 'index']);
+    Route::post('/menus', [MenuController::class, 'store']);
+    Route::get('/menus/{menu}', [MenuController::class, 'show']);
+    Route::patch('/menus/{menu}', [MenuController::class, 'update']);
+    Route::delete('/menus/{menu}', [MenuController::class, 'destroy']);
 });
