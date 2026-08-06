@@ -6,7 +6,6 @@ use App\Http\Requests\StoreChildRequest;
 use App\Http\Requests\UpdateChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
-use App\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -23,7 +22,7 @@ class ChildController extends Controller
 
         $user = Auth::user();
 
-        if ($user->role === UserRole::PARENT) {
+        if ($user->isParent()) {
             $children = $user->parent->children()->get();
 
         } else {
@@ -75,7 +74,7 @@ class ChildController extends Controller
     {
         Gate::authorize('update', $child);
 
-        $isAdmin = Auth::user()->role === UserRole::ADMIN;
+        $isAdmin = Auth::user()->isAdmin();
 
         $data = $isAdmin
             ? $request->safe()->except('parents')

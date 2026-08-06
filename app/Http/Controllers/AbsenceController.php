@@ -6,7 +6,6 @@ use App\Http\Requests\StoreAbsenceRequest;
 use App\Http\Requests\UpdateAbsenceRequest;
 use App\Http\Resources\AbsenceResource;
 use App\Models\Absence;
-use App\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -21,7 +20,7 @@ class AbsenceController extends Controller
 
         $user = Auth::user();
 
-        if ($user->role === UserRole::PARENT) {
+        if ($user->isParent()) {
             $absences = $user->parent->absences()->get();
 
         } else {

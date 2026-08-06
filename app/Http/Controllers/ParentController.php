@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateParentRequest;
 use App\Http\Resources\ParentResource;
 use App\Models\ParentUser;
 use App\Models\User;
-use App\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -76,7 +75,7 @@ class ParentController extends Controller
 
         Gate::authorize('update', $parentUser);
 
-        $isAdmin = Auth::user()->role === UserRole::ADMIN;
+        $isAdmin = Auth::user()->isAdmin();
 
         $userDataKeys = ['email', 'phone', 'password'];
         $userData = $request->safe()->only($userDataKeys);

@@ -4,17 +4,12 @@ namespace App\Policies;
 
 use App\Models\Child;
 use App\Models\User;
-use App\UserRole;
 
 class ChildPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->role === UserRole::ADMIN) {
-            return true;
-        }
-
-        return null;
+        return $user->isAdmin() ? true : null;
     }
 
     public function ownsChild(User $user, Child $child): bool
@@ -27,7 +22,7 @@ class ChildPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === UserRole::PARENT;
+        return $user->isParent();
     }
 
     /**

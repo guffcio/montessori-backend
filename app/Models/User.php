@@ -60,16 +60,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(ParentUser::class);
     }
 
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class);
-    }
-
-    public function createdNotifications(): HasMany
-    {
-        return $this->hasMany(Notification::class, 'created_by_user_id');
-    }
-
     public function reportedAbsences(): HasMany
     {
         return $this->hasMany(Absence::class, 'reported_by_user_id');
@@ -88,5 +78,15 @@ class User extends Authenticatable implements JWTSubject
     public function messageRecipients(): HasMany
     {
         return $this->hasMany(MessageRecipient::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::ADMIN;
+    }
+
+    public function isParent(): bool
+    {
+        return $this->role === UserRole::PARENT;
     }
 }

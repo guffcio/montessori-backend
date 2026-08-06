@@ -4,22 +4,12 @@ namespace App\Policies;
 
 use App\Models\Menu;
 use App\Models\User;
-use App\UserRole;
 
 class MenuPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->role === UserRole::ADMIN) {
-            return true;
-        }
-
-        return null;
-    }
-
-    public function isParent(User $user): bool
-    {
-        return $user->role === UserRole::PARENT;
+        return $user->isAdmin() ? true : null;
     }
 
     /**
@@ -27,7 +17,7 @@ class MenuPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->isParent($user);
+        return $user->isParent();
     }
 
     /**
@@ -35,7 +25,7 @@ class MenuPolicy
      */
     public function view(User $user, Menu $menu): bool
     {
-        return $this->isParent($user);
+        return $user->isParent();
     }
 
     /**
