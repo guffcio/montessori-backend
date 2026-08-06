@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreMessageRequest;
+use App\Http\Resources\MessageResource;
+use App\Jobs\SendMessageNotificationJob;
 use App\Models\Message;
+use CreateMessageAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,22 +18,37 @@ class MessageController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        if ($user->isParent()) {
+            $messages = Message::query()->whereHas('recipients', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->get();
+        } else {
+            $messages = Message::all();
+        }
+
+        return MessageResource::collection($messages);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMessageRequest $request, CreateMessageAction $action)
     {
-        //
+        $message = $action->exectute($request->validated());
+
+        SendMessageNotificationJob::dispatch($message->id);
+
+        return new MessageResource($message);
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Message $message)
+    public function show(Message $message): MessageResource
     {
-        //
+        return new MessageResource($message);
     }
 
     /**
@@ -45,6 +64,8 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        //
+        $message->delete();
+
+        return response()->noContent();
     }
 }
