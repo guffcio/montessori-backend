@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\MessageNotificationChannel;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,6 +28,10 @@ class StoreMessageRequest extends FormRequest
             'author_user_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'recipients' => ['required', 'array'],
+            'recipients.*' => ['integer', Rule::exists('users', 'id')],
+            'notification_channels' => ['nullable', 'array', 'min:1'],
+            'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];
     }
 }

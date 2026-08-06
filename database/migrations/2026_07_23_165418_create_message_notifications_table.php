@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('message_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(MessageRecipient::class)->constrained()->onDelete('cascade');
-            $table->string('type');
+            $table->string('channel');
             $table->string('status');
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();

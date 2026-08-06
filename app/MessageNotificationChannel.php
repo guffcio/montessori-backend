@@ -2,7 +2,7 @@
 
 namespace App;
 
-enum MessageNotificationType: string
+enum MessageNotificationChannel: string
 {
     case EMAIL = 'email';
 }

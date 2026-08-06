@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateMessageRequest extends FormRequest
 {
@@ -23,7 +24,10 @@ class UpdateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'new_recipients' => ['required', 'array'],
+            'new_recipients.*' => ['integer', Rule::exists('users', 'id')],
         ];
     }
 }
