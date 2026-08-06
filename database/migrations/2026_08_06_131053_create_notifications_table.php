@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,15 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(User::class, 'created_by_user_id')->constrained('users')->onDelete('cascade');
+            $table->uuid('id')->primary();
             $table->string('type');
-            $table->string('title');
-            $table->text('content');
-            $table->string('action_url');
-            $table->json('data');
-            $table->timestamp('read_at');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
     }
