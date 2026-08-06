@@ -80,9 +80,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(InvoicePayment::class);
     }
 
-    public function createdMessages(): HasMany
+    public function sentMessages(): HasMany
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class, 'author_user_id');
     }
 
     public function messageRecipients(): HasMany

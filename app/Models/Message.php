@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Message extends Model
 {
-    public function author() : BelongsTo
+    public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_user_id');
     }
 
-    public function recipients() : HasMany
+    public function recipients(): HasMany
     {
         return $this->hasMany(MessageRecipient::class);
     }

@@ -4,6 +4,7 @@ use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ParentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,4 +43,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/menus/{menu}', [MenuController::class, 'show']);
     Route::patch('/menus/{menu}', [MenuController::class, 'update']);
     Route::delete('/menus/{menu}', [MenuController::class, 'destroy']);
+
+    Route::get('/messages', [MessageController::class, 'index']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::get('/messages/{message}', [MessageController::class, 'show']);
+    Route::patch('/messages/{message}', [MessageController::class, 'update']);
+    Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
 });

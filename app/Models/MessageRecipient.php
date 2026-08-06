@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MessageRecipient extends Model
 {
@@ -15,5 +16,10 @@ class MessageRecipient extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(MessageNotification::class);
     }
 }
