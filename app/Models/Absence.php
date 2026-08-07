@@ -32,8 +32,8 @@ class Absence extends Model
         return $this->belongsTo(User::class, 'reported_by_user_id');
     }
 
-    public static function shouldChargeCatering(string $absent_at): bool
+    public static function shouldChargeCatering(string $absentAt): bool
     {
-        return today()->isSameDay($absent_at) && now()->isAfter(today()->setTime(8, 0));
+        return today()->isSameDay($absentAt) && now()->isAfter(today()->setTime(8, 0));
     }
 }

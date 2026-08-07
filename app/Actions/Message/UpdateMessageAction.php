@@ -6,15 +6,16 @@ use App\MessageNotificationStatus;
 use App\Models\Message;
 use App\Models\MessageNotification;
 use App\Models\MessageRecipient;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class UpdateMessageAction
 {
-    public function execute(Message $message, array $data): void
+    public function execute(Message $message, array $data): Collection
     {
 
-        $new_recipients = $data['new_recipients'] ?? [];
+        $newRecipients = $data['new_recipients'] ?? [];
         $notificationChannels = $data['notification_channels'] ?? [];
 
         $messageData = Arr::except($data, [
@@ -22,14 +23,17 @@ class UpdateMessageAction
             'notification_channels',
         ]);
 
-        DB::transaction(function () use ($message, $messageData, $new_recipients, $notificationChannels) {
+        return DB::transaction(function () use ($message, $messageData, $newRecipients, $notificationChannels) {
+            $recipients = new Collection;
             $message->update($messageData);
 
-            foreach ($new_recipients as $user_id) {
+            foreach ($newRecipients as $userId) {
                 $recipient = MessageRecipient::firstOrCreate([
                     'message_id' => $message->id,
-                    'user_id' => $user_id,
+                    'user_id' => $userId,
                 ]);
+
+                $recipients->push($recipient);
 
                 if (! empty($notificationChannels)) {
                     foreach ($notificationChannels as $notificationChannel) {
@@ -41,6 +45,8 @@ class UpdateMessageAction
                     }
                 }
             }
+
+            return $recipients;
         });
 
     }

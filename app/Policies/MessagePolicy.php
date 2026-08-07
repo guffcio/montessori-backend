@@ -4,16 +4,27 @@ namespace App\Policies;
 
 use App\Models\Message;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class MessagePolicy
 {
+    public function before(User $user): bool
+    {
+        return $user->isAdmin() ? true : null;
+    }
+
+    private function isRecipient(User $user, Message $message): bool
+    {
+        return $message->recipients()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isParent();
     }
 
     /**
@@ -21,7 +32,7 @@ class MessagePolicy
      */
     public function view(User $user, Message $message): bool
     {
-        return false;
+        return $this->isRecipient($user, $message);
     }
 
     /**

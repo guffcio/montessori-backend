@@ -15,11 +15,11 @@ class AbsencePolicy
         return $user->isAdmin() ? true : null;
     }
 
-    public function ownsChild(User $user, int $child_id): bool
+    public function ownsChild(User $user, int $childId): bool
     {
         return $user->parent
             ->children()
-            ->whereKey($child_id)
+            ->whereKey($childId)
             ->exists();
     }
 
@@ -42,9 +42,9 @@ class AbsencePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, int $child_id): bool
+    public function create(User $user, int $childId): bool
     {
-        return $this->ownsChild($user, $child_id);
+        return $this->ownsChild($user, $childId);
     }
 
     /**

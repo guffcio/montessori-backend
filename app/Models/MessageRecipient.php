@@ -27,4 +27,15 @@ class MessageRecipient extends Model
     {
         return $this->hasMany(MessageNotification::class);
     }
+
+    public function markAsRead(): void
+    {
+        if ($this->read_at !== null) {
+            return;
+        }
+
+        $this->update([
+            'read_at' => now(),
+        ]);
+    }
 }

@@ -25,10 +25,10 @@ class CreateMessageAction
         return DB::transaction(function () use ($messageData, $recipients, $notificationChannels) {
             $message = Message::create($messageData);
 
-            foreach ($recipients as $user_id) {
+            foreach ($recipients as $userId) {
                 $recipient = MessageRecipient::create([
                     'message_id' => $message->id,
-                    'user_id' => $user_id,
+                    'user_id' => $userId,
                 ]);
 
                 if (! empty($notificationChannels)) {

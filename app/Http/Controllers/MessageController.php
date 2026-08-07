@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Message\CreateMessageAction;
+use App\Actions\Message\NotifyMessageRecipientsAction;
 use App\Actions\Message\UpdateMessageAction;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Jobs\SendMessageNotificationJob;
 use App\Models\Message;
+use App\Policies\MessagePolicy;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class MessageController extends Controller
 {
@@ -18,6 +21,9 @@ class MessageController extends Controller
      */
     public function index()
     {
+
+        Gate::authorize('viewAny', MessagePolicy::class);
+
         $user = Auth::user();
 
         if ($user->isParent()) {
@@ -34,7 +40,11 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request, CreateMessageAction $action)
     {
+        Gate::authorize('create', MessagePolicy::class);
+
         $message = $action->exectute($request->validated());
+
+        NotifyMessageRecipientsAction::execute($message, $message->recipients);
 
         SendMessageNotificationJob::dispatch($message->id);
 
@@ -47,6 +57,15 @@ class MessageController extends Controller
      */
     public function show(Message $message): MessageResource
     {
+
+        Gate::authorize('view', $message);
+
+        $recipient = $message->recipients()
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $recipient->markAsRead();
+
         return new MessageResource($message);
     }
 
@@ -56,7 +75,11 @@ class MessageController extends Controller
     public function update(UpdateMessageRequest $request, Message $message, UpdateMessageAction $action)
     {
 
-        $action->execute($message, $request->validated());
+        Gate::authorize('update', $message);
+
+        $newRecipients = $action->execute($message, $request->validated());
+
+        NotifyMessageRecipientsAction::execute($message, $newRecipients);
 
         SendMessageNotificationJob::dispatch($message->id);
 
@@ -68,6 +91,8 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
+        Gate::authorize('delete', $message);
+
         $message->delete();
 
         return response()->noContent();
