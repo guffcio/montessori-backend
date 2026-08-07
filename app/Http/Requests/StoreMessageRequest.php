@@ -30,7 +30,7 @@ class StoreMessageRequest extends FormRequest
             'content' => ['required', 'string'],
             'recipients' => ['required', 'array'],
             'recipients.*' => ['integer', Rule::exists('users', 'id')],
-            'notification_channels' => ['nullable', 'array', 'min:1'],
+            'notification_channels' => ['sometimes', 'array'],
             'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];
     }

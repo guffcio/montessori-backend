@@ -35,7 +35,7 @@ class StoreParentRequest extends FormRequest
             'apartment_number' => ['nullable', 'string', 'max:10'],
             'city' => ['required', 'string', 'max:255'],
             'postal_code' => ['required', 'string', 'max:10'],
-            'children' => ['nullable', 'array'],
+            'children' => ['sometimes', 'array'],
             'children.*' => ['integer', Rule::exists('children', 'id')],
         ];
     }

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Child\CreateChildAction;
+use App\Actions\Child\UpdateChildAction;
 use App\Http\Requests\StoreChildRequest;
 use App\Http\Requests\UpdateChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ChildController extends Controller
@@ -35,24 +36,12 @@ class ChildController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreChildRequest $request): ChildResource
+    public function store(StoreChildRequest $request, CreateChildAction $action): ChildResource
     {
 
         Gate::authorize('create', Child::class);
 
-        $data = $request->safe()->except('parents');
-        $parents = $request->safe()->input('parents');
-        $allergens = $request->safe()->input('allergens');
-
-        $child = DB::transaction(function () use ($data, $parents, $allergens) {
-            $child = Child::create($data);
-
-            $child->parents()->sync($parents);
-
-            $child->allergens()->sync($allergens);
-
-            return $child;
-        });
+        $child = $action->execute($request->validated());
 
         return new ChildResource($child);
     }
@@ -70,33 +59,11 @@ class ChildController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateChildRequest $request, Child $child): ChildResource
+    public function update(UpdateChildRequest $request, Child $child, UpdateChildAction $action): ChildResource
     {
         Gate::authorize('update', $child);
 
-        $isAdmin = Auth::user()->isAdmin();
-
-        $data = $isAdmin
-            ? $request->safe()->except('parents')
-            : $request->safe()->only([
-                'first_name',
-                'last_name',
-                'birth_date',
-                'pesel',
-            ]);
-
-        DB::transaction(function () use ($child, $data, $request, $isAdmin) {
-
-            $child->update($data);
-
-            if ($isAdmin) {
-                $child->parents()->sync(
-                    $request->validated('parents', [])
-                );
-            }
-
-            $child->allergens()->sync($request->validated('allergens', []));
-        });
+        $action->execute($child, $request->validated());
 
         return new ChildResource($child->fresh());
     }

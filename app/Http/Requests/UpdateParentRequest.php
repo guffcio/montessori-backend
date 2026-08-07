@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\ParentUser;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -36,10 +37,10 @@ class UpdateParentRequest extends FormRequest
             'password' => ['sometimes', 'string', 'min:8', 'max:255', Password::defaults()],
             'street' => ['sometimes', 'string', 'max:255'],
             'house_number' => ['sometimes', 'string', 'max:10'],
-            'apartment_number' => ['nullable', 'string', 'max:10'],
+            'apartment_number' => ['sometimes', 'string', 'max:10'],
             'city' => ['sometimes', 'string', 'max:255'],
             'postal_code' => ['sometimes', 'string', 'max:10'],
-            'children' => ['nullable', 'array'],
+            'children' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array']),
             'children.*' => ['integer', Rule::exists('children', 'id')],
         ];
     }

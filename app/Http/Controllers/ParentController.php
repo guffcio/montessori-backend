@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Parent\CreateParentAction;
+use App\Actions\Parent\UpdateParentAction;
 use App\Http\Requests\StoreParentRequest;
 use App\Http\Requests\UpdateParentRequest;
 use App\Http\Resources\ParentResource;
 use App\Models\ParentUser;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 
 class ParentController extends Controller
 {
@@ -27,31 +25,12 @@ class ParentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreParentRequest $request): ParentResource
+    public function store(StoreParentRequest $request, CreateParentAction $action): ParentResource
     {
 
         Gate::authorize('create', ParentUser::class);
 
-        $userDataKeys = ['email', 'phone', 'password'];
-
-        $userData = $request->safe()->only($userDataKeys);
-        $parentData = $request->safe()->except([...$userDataKeys, 'children']);
-        $children = $request->safe()->input('children', []);
-
-        $userData['password'] = Hash::make($userData['password']);
-
-        $parent = DB::transaction(function () use ($userData, $parentData, $children) {
-            $user = User::create($userData);
-
-            $parent = ParentUser::create([
-                ...$parentData,
-                'user_id' => $user->id,
-            ]);
-
-            $parent->children()->sync($children);
-
-            return $parent;
-        });
+        $parent = $action->exectute($request->validated());
 
         return new ParentResource($parent);
     }
@@ -70,35 +49,14 @@ class ParentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateParentRequest $request, ParentUser $parentUser): ParentResource
+    public function update(UpdateParentRequest $request, ParentUser $parentUser, UpdateParentAction $action): ParentResource
     {
 
         Gate::authorize('update', $parentUser);
 
-        $isAdmin = Auth::user()->isAdmin();
+        $action->exectute($parentUser, $request->validated());
 
-        $userDataKeys = ['email', 'phone', 'password'];
-        $userData = $request->safe()->only($userDataKeys);
-        $parentData = $request->safe()->except([...$userDataKeys, 'children']);
-
-        if (! empty($userData['password'])) {
-            $userData['password'] = Hash::make($userData['password']);
-        } else {
-            unset($userData['password']);
-        }
-
-        $parentUser = DB::transaction(function () use ($parentUser, $userData, $parentData, $request, $isAdmin) {
-            $parentUser->update($parentData);
-            $parentUser->user()->update($userData);
-
-            if ($isAdmin) {
-                $parentUser->children()->sync($request->validated('children', []));
-            }
-
-            return $parentUser;
-        });
-
-        return new ParentResource($parentUser);
+        return new ParentResource($parentUser->fresh());
 
     }
 

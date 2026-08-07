@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Message\CreateMessageAction;
+use App\Actions\Message\UpdateMessageAction;
 use App\Http\Requests\StoreMessageRequest;
+use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Jobs\SendMessageNotificationJob;
 use App\Models\Message;
-use CreateMessageAction;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -20,9 +21,7 @@ class MessageController extends Controller
         $user = Auth::user();
 
         if ($user->isParent()) {
-            $messages = Message::query()->whereHas('recipients', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->get();
+            $messages = Message::forRecipient($user)->get();
         } else {
             $messages = Message::all();
         }
@@ -54,9 +53,14 @@ class MessageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Message $message)
+    public function update(UpdateMessageRequest $request, Message $message, UpdateMessageAction $action)
     {
-        //
+
+        $action->execute($message, $request->validated());
+
+        SendMessageNotificationJob::dispatch($message->id);
+
+        return new MessageResource($message->fresh());
     }
 
     /**

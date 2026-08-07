@@ -23,7 +23,7 @@ class UpdateAbsenceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'charge_catering' => ['required', 'boolean'],
+            'charge_catering' => ['sometimes', 'boolean'],
         ];
     }
 }

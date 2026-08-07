@@ -36,9 +36,9 @@ class StoreChildRequest extends FormRequest
             'pesel' => ['required', 'string', 'digits:11', Rule::unique('children', 'pesel')],
             'started_at' => ['required', 'date'],
             'preschool_started_at' => ['nullable', 'date'],
-            'parents' => ['nullable', 'array'],
+            'parents' => ['sometimes', 'array'],
             'parents.*' => ['integer', Rule::exists('parents', 'id')],
-            'allergens' => ['nullable', 'array'],
+            'allergens' => ['sometimes', 'array'],
             'allergens.*' => ['integer', Rule::exists('allergens', 'id')],
         ];
     }

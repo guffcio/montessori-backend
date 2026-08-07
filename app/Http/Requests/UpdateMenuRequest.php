@@ -27,8 +27,8 @@ class UpdateMenuRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'menu_date' => ['required', 'date', Rule::unique('menus', 'menu_date')->ignore($this->menu)],
-            'content' => ['required', 'string'],
+            'menu_date' => ['sometimes', 'date', Rule::unique('menus', 'menu_date')->ignore($this->menu)],
+            'content' => ['sometimes', 'string'],
         ];
     }
 }

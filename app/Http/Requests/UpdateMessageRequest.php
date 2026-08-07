@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\MessageNotificationChannel;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,10 +25,12 @@ class UpdateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-            'new_recipients' => ['required', 'array'],
+            'title' => ['sometimes', 'string', 'max:255'],
+            'content' => ['sometimes', 'string'],
+            'new_recipients' => ['sometimes', 'array'],
             'new_recipients.*' => ['integer', Rule::exists('users', 'id')],
+            'notification_channels' => ['sometimes', 'array'],
+            'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];
     }
 }

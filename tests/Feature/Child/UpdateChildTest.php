@@ -71,9 +71,7 @@ test('parent cannot update another child', function () {
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
-        'zone_id' => $otherChild->zone->id,
         'pesel' => '11111111111',
-        'started_at' => '2026-07-30',
     ]);
 
     $response->assertStatus(403);
@@ -243,9 +241,7 @@ test('parent can replace assigned allergens', function () {
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
-        'zone_id' => $child->zone->id,
         'pesel' => '11111111111',
-        'started_at' => '2026-07-30',
         'allergens' => $newAllergensIds,
     ]);
 
@@ -311,9 +307,7 @@ test('parent can remove all allergens', function () {
         'first_name' => 'Leo',
         'last_name' => 'Smith',
         'birth_date' => '2023-05-24',
-        'zone_id' => $child->zone->id,
         'pesel' => '11111111111',
-        'started_at' => '2026-07-30',
         'allergens' => [],
     ]);
 
@@ -352,17 +346,8 @@ test('parent can update only strict fields', function () {
         'allergens' => $allergenIds,
     ]);
 
-    $response->assertStatus(200);
-
-    $this->assertDatabaseHas('children', [
-        'id' => $child->id,
-        'first_name' => 'Leo',
-        'last_name' => 'Smith',
-        'birth_date' => '2023-05-24',
-        'zone_id' => $child->zone->id,
-        'pesel' => '11111111111',
-        'started_at' => $child->started_at,
-    ]);
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['zone_id', 'started_at', 'parents']);
 
     $this->assertDatabaseCount('parent_child', 1);
 
@@ -371,14 +356,7 @@ test('parent can update only strict fields', function () {
         'child_id' => $child->id,
     ]);
 
-    foreach ($allergenIds as $allergenId) {
-        $this->assertDatabaseHas('allergen_child', [
-            'child_id' => $response->json('data.id'),
-            'allergen_id' => $allergenId,
-        ]);
-    }
-
-    $this->assertDatabaseCount('allergen_child', 5);
+    $this->assertDatabaseCount('allergen_child', 0);
 
 });
 

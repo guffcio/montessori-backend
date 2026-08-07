@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Message;
 
 use App\Models\Message;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class NewMessageMail extends Mailable
 {
@@ -19,8 +19,7 @@ class NewMessageMail extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        private Message $message,
-        private User $user
+        public Message $message
     ) {
         //
     }
@@ -31,7 +30,7 @@ class NewMessageMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Message Notification Mail',
+            subject: 'Nowa wiadomość dostępna w panelu',
         );
     }
 
@@ -41,7 +40,11 @@ class NewMessageMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.new-message',
+            with: [
+                'preview' => Str::limit($this->message->content, (int) ceil(mb_strlen($this->message->content) * 0.25)),
+                'url' => $this->message->getFrontendUrl(),
+            ]
         );
     }
 

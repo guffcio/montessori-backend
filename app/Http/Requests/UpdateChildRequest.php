@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Child;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 /**
@@ -32,13 +33,13 @@ class UpdateChildRequest extends FormRequest
             'first_name' => ['sometimes', 'string', 'max:255'],
             'last_name' => ['sometimes', 'string', 'max:255'],
             'birth_date' => ['sometimes', 'date'],
-            'zone_id' => ['sometimes', 'integer', Rule::exists('zones', 'id')],
+            'zone_id' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'integer', Rule::exists('zones', 'id')]),
             'pesel' => ['sometimes', 'string', 'digits:11', Rule::unique('children', 'pesel')->ignore($this->child)],
-            'started_at' => ['sometimes', 'date'],
-            'preschool_started_at' => ['nullable', 'date'],
-            'parents' => ['nullable', 'array'],
+            'started_at' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'date']),
+            'preschool_started_at' => Rule::when(Auth::user()->isParent(), ['missing'], ['nullable', 'date']),
+            'parents' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array']),
             'parents.*' => ['integer', Rule::exists('parents', 'id')],
-            'allergens' => ['nullable', 'array'],
+            'allergens' => ['sometimes', 'array'],
             'allergens.*' => ['integer', Rule::exists('allergens', 'id')],
         ];
     }

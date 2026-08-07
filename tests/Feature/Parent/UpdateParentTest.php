@@ -268,6 +268,7 @@ test('parent cannot assign children', function () {
         'children' => $childrenIds,
     ]);
 
-    $response->assertStatus(200);
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('children');
     $this->assertDatabaseCount('parent_child', 0);
 });
