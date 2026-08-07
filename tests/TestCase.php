@@ -5,6 +5,7 @@ namespace Tests;
 use App\Models\Absence;
 use App\Models\Child;
 use App\Models\Menu;
+use App\Models\Message;
 use App\Models\ParentUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -54,6 +55,13 @@ abstract class TestCase extends BaseTestCase
         $menu = Menu::factory()->create();
 
         return $menu;
+    }
+
+    protected function createMessage(): Message
+    {
+        $message = Message::factory()->withRecipients(3, true)->create();
+
+        return $message;
     }
 
     protected function actingAsAdmin(): User

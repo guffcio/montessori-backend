@@ -7,8 +7,9 @@ use App\Models\User;
 
 class MessagePolicy
 {
-    public function before(User $user): bool
+    public function before(User $user): ?bool
     {
+
         return $user->isAdmin() ? true : null;
     }
 

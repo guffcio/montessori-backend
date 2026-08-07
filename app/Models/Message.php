@@ -39,4 +39,16 @@ class Message extends Model
             $query->where('user_id', $user->id);
         });
     }
+
+    public function markAsReadFor(User $user): void
+    {
+        if (! $user->isParent()) {
+            return;
+        }
+
+        $this->recipients()
+            ->where('user_id', $user->id)
+            ->firstOrFail()
+            ->markAsRead();
+    }
 }

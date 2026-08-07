@@ -10,7 +10,6 @@ use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Jobs\SendMessageNotificationJob;
 use App\Models\Message;
-use App\Policies\MessagePolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -22,7 +21,7 @@ class MessageController extends Controller
     public function index()
     {
 
-        Gate::authorize('viewAny', MessagePolicy::class);
+        Gate::authorize('viewAny', Message::class);
 
         $user = Auth::user();
 
@@ -40,7 +39,7 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request, CreateMessageAction $action)
     {
-        Gate::authorize('create', MessagePolicy::class);
+        Gate::authorize('create', Message::class);
 
         $message = $action->exectute($request->validated());
 
@@ -60,11 +59,7 @@ class MessageController extends Controller
 
         Gate::authorize('view', $message);
 
-        $recipient = $message->recipients()
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        $recipient->markAsRead();
+        $message->markAsReadFor(Auth::user());
 
         return new MessageResource($message);
     }
