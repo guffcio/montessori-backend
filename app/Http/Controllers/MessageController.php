@@ -37,13 +37,13 @@ class MessageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMessageRequest $request, CreateMessageAction $action)
+    public function store(StoreMessageRequest $request, CreateMessageAction $action, NotifyMessageRecipientsAction $notifyAction)
     {
         Gate::authorize('create', Message::class);
 
         $message = $action->exectute($request->validated());
 
-        NotifyMessageRecipientsAction::execute($message, $message->recipients);
+        $notifyAction->execute($message, $message->recipients);
 
         SendMessageNotificationJob::dispatch($message->id);
 
@@ -67,14 +67,14 @@ class MessageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMessageRequest $request, Message $message, UpdateMessageAction $action)
+    public function update(UpdateMessageRequest $request, Message $message, UpdateMessageAction $action, NotifyMessageRecipientsAction $notifyAction)
     {
 
         Gate::authorize('update', $message);
 
         $newRecipients = $action->execute($message, $request->validated());
 
-        NotifyMessageRecipientsAction::execute($message, $newRecipients);
+        $notifyAction->execute($message, $newRecipients);
 
         SendMessageNotificationJob::dispatch($message->id);
 

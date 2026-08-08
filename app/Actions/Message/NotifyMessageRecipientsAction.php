@@ -9,11 +9,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class NotifyMessageRecipientsAction
 {
-    private function __callStatic($method, $arguments)
-    {
-        $this->$method($arguments);
-    }
-
     public function execute(Message $message, Collection $recipients): void
     {
 

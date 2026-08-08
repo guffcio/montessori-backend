@@ -7,6 +7,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property Message $message
+ */
 class UpdateMessageRequest extends FormRequest
 {
     /**
@@ -27,8 +30,9 @@ class UpdateMessageRequest extends FormRequest
         return [
             'title' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
-            'new_recipients' => ['sometimes', 'array'],
-            'new_recipients.*' => ['integer', Rule::exists('users', 'id')],
+            'new_recipients' => ['sometimes', 'array', 'distinct'],
+            'new_recipients.*' => ['integer', Rule::exists('users', 'id'), Rule::unique('message_recipients', 'user_id')
+                ->where(fn ($query) => $query->where('message_id', $this->message->id))],
             'notification_channels' => ['sometimes', 'array'],
             'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];

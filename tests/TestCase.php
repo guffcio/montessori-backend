@@ -57,9 +57,9 @@ abstract class TestCase extends BaseTestCase
         return $menu;
     }
 
-    protected function createMessage(): Message
+    protected function createMessage($data = []): Message
     {
-        $message = Message::factory()->withRecipients(3, true)->create();
+        $message = Message::factory()->withRecipients(3, true)->create($data);
 
         return $message;
     }
