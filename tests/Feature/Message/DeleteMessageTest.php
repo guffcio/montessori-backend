@@ -30,7 +30,9 @@ test('message is soft deleted', function () {
 
     $message = $this->createMessage();
 
-    $this->deleteJson("/api/messages/{$message->id}");
+    $response = $this->deleteJson("/api/messages/{$message->id}");
+
+    $response->assertStatus(204);
     $this->assertSoftDeleted($message);
 });
 

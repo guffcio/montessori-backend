@@ -64,11 +64,13 @@ test('updates message_notifications table', function () {
 
     $this->travel(25)->hours();
 
-    $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
+    $response = $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
 
     $notification = MessageNotification::latest('id')->first();
+
+    $response->assertStatus(200);
 
     $this->assertDatabaseHas('message_notifications', [
         'id' => $notification->id,
@@ -108,9 +110,11 @@ test('dispatches send notification job', function () {
 
     $this->travel(25)->hours();
 
-    $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
+    $response = $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     expect(MessageNotification::count())
         ->toBe($beforeCount + 1);
@@ -136,6 +140,8 @@ test('skips channel notified within last 24 hours', function () {
     $response = $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     expect(MessageNotification::count())->toBe($beforeCount);
 
@@ -170,6 +176,8 @@ test('allows notification after 24 hours', function () {
     $response = $this->postJson("/api/messages/{$message->id}/notify/{$recipient->id}", [
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     expect(MessageNotification::count())->toBe($beforeCount + 1);
 

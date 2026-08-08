@@ -58,10 +58,12 @@ test('updates messages table', function () {
 
     $message = $this->createMessage();
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => 'Example message title',
         'content' => 'Example message content',
     ]);
+
+    $response->assertStatus(200);
 
     $this->assertDatabaseHas('messages', [
         'id' => $message->id,
@@ -77,11 +79,13 @@ test('admin can update only strict fields', function () {
         'author_user_id' => $user->id,
     ]);
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'author_user_id' => $this->createParent()->user->id,
         'title' => 'Example message title',
         'content' => 'Example message content',
     ]);
+
+    $response->assertStatus(200);
 
     $this->assertDatabaseHas('messages', [
         'author_user_id' => $user->id,
@@ -98,12 +102,14 @@ test('adds new recipients', function () {
     $recipients = ParentUser::factory()->count(5)->create();
     $newRecipientsIds = $recipients->pluck('user_id');
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => 'Example message title',
         'content' => 'Example message content',
         'new_recipients' => $newRecipientsIds,
         'notification_channels' => [],
     ]);
+
+    $response->assertStatus(200);
 
     foreach ($newRecipientsIds as $userId) {
         $this->assertDatabaseHas('message_recipients', [
@@ -148,12 +154,14 @@ test('create message_notifications for new recipients', function () {
     $recipients = ParentUser::factory()->count(5)->create();
     $newRecipientsIds = $recipients->pluck('user_id');
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => $message->title,
         'content' => $message->content,
         'new_recipients' => $newRecipientsIds,
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     MessageRecipient::where('message_id', $message->id)
         ->whereIn('user_id', $newRecipientsIds)
@@ -179,12 +187,14 @@ test('does not duplicate message_notifications', function () {
     $newRecipients = ParentUser::factory()->count(5)->create();
     $newRecipientsIds = $newRecipients->pluck('user_id');
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => $message->title,
         'content' => $message->content,
         'new_recipients' => $newRecipientsIds,
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     foreach ($recipientIds as $recipientId) {
         expect(
@@ -202,12 +212,14 @@ test('send notification only to new recipients', function () {
     $newRecipients = ParentUser::factory()->count(5)->create();
     $newRecipientsIds = $newRecipients->pluck('user_id');
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => $message->title,
         'content' => $message->content,
         'new_recipients' => $newRecipientsIds,
         'notification_channels' => [],
     ]);
+
+    $response->assertStatus(200);
 
     foreach ($recipientIds as $recipientId) {
         expect(
@@ -233,12 +245,14 @@ test('dispatches job', function () {
     $newRecipients = ParentUser::factory()->count(5)->create();
     $newRecipientsIds = $newRecipients->pluck('user_id');
 
-    $this->patchJson("/api/messages/{$message->id}", [
+    $response = $this->patchJson("/api/messages/{$message->id}", [
         'title' => 'Example message title',
         'content' => 'Example message content',
         'new_recipients' => $newRecipientsIds,
         'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $response->assertStatus(200);
 
     $newNotifications = MessageNotification::query()
         ->whereHas('recipient', function ($query) use ($message, $newRecipientsIds) {
