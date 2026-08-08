@@ -3,6 +3,7 @@
 use App\Jobs\SendMessageNotificationJob;
 use App\MessageNotificationChannel;
 use App\MessageNotificationStatus;
+use App\Models\MessageNotification;
 use App\Models\MessageRecipient;
 use App\Models\ParentUser;
 use App\Models\User;
@@ -260,14 +261,25 @@ test('dispatches SendMessageNotificationJob', function () {
         'title' => 'Example message title',
         'content' => 'Example message content',
         'recipients' => $recipientsIds,
-        'notification_channels' => [],
+        'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
 
     $response->assertStatus(201);
 
+    $notifications = MessageNotification::all();
+
+    expect($notifications)->not->toBeEmpty();
+
     Queue::assertPushed(
         SendMessageNotificationJob::class,
-        fn (SendMessageNotificationJob $job) => $job->messageId === $response->json('data.id')
+        $notifications->count()
     );
+
+    foreach ($notifications as $notification) {
+        Queue::assertPushed(
+            SendMessageNotificationJob::class,
+            fn (SendMessageNotificationJob $job) => $job->notificationId === $notification->id
+        );
+    }
 
 });

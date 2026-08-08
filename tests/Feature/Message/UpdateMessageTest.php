@@ -230,14 +230,35 @@ test('dispatches job', function () {
 
     $message = $this->createMessage();
 
+    $newRecipients = ParentUser::factory()->count(5)->create();
+    $newRecipientsIds = $newRecipients->pluck('user_id');
+
     $this->patchJson("/api/messages/{$message->id}", [
-        'title' => $message->title,
-        'content' => $message->content,
+        'title' => 'Example message title',
+        'content' => 'Example message content',
+        'new_recipients' => $newRecipientsIds,
+        'notification_channels' => [MessageNotificationChannel::EMAIL],
     ]);
+
+    $newNotifications = MessageNotification::query()
+        ->whereHas('recipient', function ($query) use ($message, $newRecipientsIds) {
+            $query->where('message_id', $message->id)
+                ->whereIn('user_id', $newRecipientsIds);
+        })
+        ->get();
+
+    expect($newNotifications)->toHaveCount(5);
 
     Queue::assertPushed(
         SendMessageNotificationJob::class,
-        fn (SendMessageNotificationJob $job) => $job->messageId === $message->id
+        $newNotifications->count()
     );
+
+    foreach ($newNotifications as $notification) {
+        Queue::assertPushed(
+            SendMessageNotificationJob::class,
+            fn (SendMessageNotificationJob $job) => $job->notificationId === $notification->id
+        );
+    }
 
 });

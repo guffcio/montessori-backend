@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Message;
+use App\Models\MessageRecipient;
 use App\Models\User;
 
 class MessagePolicy
@@ -74,5 +75,13 @@ class MessagePolicy
     public function forceDelete(User $user, Message $message): bool
     {
         return false;
+    }
+
+    /**
+     * Determine whether the user can notify recipients the model.
+     */
+    public function notify(User $user, Message $message, MessageRecipient $recipient): bool
+    {
+        return $user->isAdmin() && $recipient->message_id === $message->id;
     }
 }

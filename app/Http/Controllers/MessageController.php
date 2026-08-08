@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Message\CreateMessageAction;
+use App\Actions\Message\MessageNotificationAction;
 use App\Actions\Message\NotifyMessageRecipientsAction;
 use App\Actions\Message\UpdateMessageAction;
+use App\Http\Requests\MessageNotificationRequest;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\MessageResource;
-use App\Jobs\SendMessageNotificationJob;
 use App\Models\Message;
+use App\Models\MessageRecipient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -45,8 +47,6 @@ class MessageController extends Controller
 
         $notifyAction->execute($message, $message->recipients);
 
-        SendMessageNotificationJob::dispatch($message->id);
-
         return new MessageResource($message);
 
     }
@@ -76,8 +76,6 @@ class MessageController extends Controller
 
         $notifyAction->execute($message, $newRecipients);
 
-        SendMessageNotificationJob::dispatch($message->id);
-
         return new MessageResource($message->fresh());
     }
 
@@ -91,5 +89,24 @@ class MessageController extends Controller
         $message->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * Notify the specified recipient.
+     */
+    public function notify(MessageNotificationRequest $request, Message $message, MessageRecipient $recipient, MessageNotificationAction $action)
+    {
+        Gate::authorize('notify', [$message, $recipient]);
+
+        $result = $action->execute($request->validated(), $recipient);
+
+        return response()->json([
+            'data' => [
+                'success' => ! empty($result['created_channels']),
+                'created_channels' => $result['created_channels'],
+                'skipped_channels' => $result['skipped_channels'],
+            ],
+        ]);
+
     }
 }

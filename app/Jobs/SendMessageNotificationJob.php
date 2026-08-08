@@ -18,7 +18,7 @@ class SendMessageNotificationJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public int $messageId
+        public int $notificationId
     ) {
         //
     }
@@ -28,35 +28,44 @@ class SendMessageNotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-
-        $notifications = MessageNotification::query()
-            ->whereHas('recipient', fn ($query) => $query->where('message_id', $this->messageId))
-            ->where('status', MessageNotificationStatus::INIT)
+        $notification = MessageNotification::query()
             ->with(['recipient.user', 'recipient.message'])
-            ->get();
+            ->find($this->notificationId);
 
-        if ($notifications->isEmpty()) {
+        if (! $notification) {
             return;
         }
 
-        foreach ($notifications as $notification) {
-            $notification->update(['status' => MessageNotificationStatus::PENDING]);
+        if ($notification->status !== MessageNotificationStatus::INIT) {
+            return;
+        }
 
-            try {
-                if ($notification->channel === MessageNotificationChannel::EMAIL) {
-                    Mail::to($notification->recipient->user->email)->send(new NewMessageMail($notification->recipient->message));
-                }
+        $notification->update([
+            'status' => MessageNotificationStatus::PENDING,
+        ]);
 
-                $notification->update([
-                    'status' => MessageNotificationStatus::SENT,
-                    'sent_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                $notification->update(['status' => MessageNotificationStatus::FAILED]);
-
-                throw $e;
+        try {
+            if ($notification->channel === MessageNotificationChannel::EMAIL) {
+                Mail::to(
+                    $notification->recipient->user->email
+                )->send(
+                    new NewMessageMail(
+                        $notification->recipient->message
+                    )
+                );
             }
 
+            $notification->update([
+                'status' => MessageNotificationStatus::SENT,
+                'sent_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+
+            $notification->update([
+                'status' => MessageNotificationStatus::FAILED,
+            ]);
+
+            throw $e;
         }
     }
 }

@@ -49,4 +49,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/messages/{message}', [MessageController::class, 'show']);
     Route::patch('/messages/{message}', [MessageController::class, 'update']);
     Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
+    Route::post('/messages/{message}/notify/{recipient}', [MessageController::class, 'notify']);
 });

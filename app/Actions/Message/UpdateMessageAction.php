@@ -2,6 +2,7 @@
 
 namespace App\Actions\Message;
 
+use App\Jobs\SendMessageNotificationJob;
 use App\MessageNotificationStatus;
 use App\Models\Message;
 use App\Models\MessageNotification;
@@ -37,11 +38,13 @@ class UpdateMessageAction
 
                 if (! empty($notificationChannels)) {
                     foreach ($notificationChannels as $notificationChannel) {
-                        MessageNotification::firstOrCreate([
+                        $notification = MessageNotification::firstOrCreate([
                             'message_recipient_id' => $recipient->id,
                             'channel' => $notificationChannel,
                             'status' => MessageNotificationStatus::INIT,
                         ]);
+
+                        SendMessageNotificationJob::dispatch($notification->id);
                     }
                 }
             }
