@@ -40,7 +40,7 @@ class UpdateParentRequest extends FormRequest
             'apartment_number' => ['sometimes', 'string', 'max:10'],
             'city' => ['sometimes', 'string', 'max:255'],
             'postal_code' => ['sometimes', 'string', 'max:10'],
-            'children' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array']),
+            'children' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array', 'distinct']),
             'children.*' => ['integer', Rule::exists('children', 'id')],
         ];
     }

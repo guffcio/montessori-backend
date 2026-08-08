@@ -37,9 +37,9 @@ class UpdateChildRequest extends FormRequest
             'pesel' => ['sometimes', 'string', 'digits:11', Rule::unique('children', 'pesel')->ignore($this->child)],
             'started_at' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'date']),
             'preschool_started_at' => Rule::when(Auth::user()->isParent(), ['missing'], ['nullable', 'date']),
-            'parents' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array']),
+            'parents' => Rule::when(Auth::user()->isParent(), ['missing'], ['sometimes', 'array', 'distinct']),
             'parents.*' => ['integer', Rule::exists('parents', 'id')],
-            'allergens' => ['sometimes', 'array'],
+            'allergens' => ['sometimes', 'array', 'distinct'],
             'allergens.*' => ['integer', Rule::exists('allergens', 'id')],
         ];
     }

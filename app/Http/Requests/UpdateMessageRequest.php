@@ -33,7 +33,7 @@ class UpdateMessageRequest extends FormRequest
             'new_recipients' => ['sometimes', 'array', 'distinct'],
             'new_recipients.*' => ['integer', Rule::exists('users', 'id'), Rule::unique('message_recipients', 'user_id')
                 ->where(fn ($query) => $query->where('message_id', $this->message->id))],
-            'notification_channels' => ['sometimes', 'array'],
+            'notification_channels' => ['sometimes', 'array', 'distinct'],
             'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];
     }

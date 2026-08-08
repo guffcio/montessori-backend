@@ -28,9 +28,9 @@ class StoreMessageRequest extends FormRequest
             'author_user_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'recipients' => ['required', 'array'],
+            'recipients' => ['required', 'array', 'distinct'],
             'recipients.*' => ['integer', Rule::exists('users', 'id')],
-            'notification_channels' => ['sometimes', 'array'],
+            'notification_channels' => ['sometimes', 'array', 'distinct'],
             'notification_channels.*' => ['string', Rule::enum(MessageNotificationChannel::class)],
         ];
     }
