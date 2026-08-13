@@ -13,6 +13,7 @@
         "laravel/framework": "^13.8",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
+        "openpayu/openpayu": "2.4",
         "propaganistas/laravel-phone": "^6.0",
         "tymon/jwt-auth": "^2.3"
     },
@@ -53,9 +54,9 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
         ],
-         "format": [
-           "vendor/bin/rector",
-           "vendor/bin/pint"
+        "format": [
+            "vendor/bin/rector",
+            "vendor/bin/pint"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",

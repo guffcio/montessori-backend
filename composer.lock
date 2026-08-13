@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f5986027a3ac2e6a0541b0a00a71e44e",
+    "content-hash": "ab15ab793856f2b34af2664847b82a1e",
     "packages": [
         {
             "name": "brick/math",
@@ -2755,6 +2755,57 @@
                 }
             ],
             "time": "2026-02-16T23:10:27+00:00"
+        },
+        {
+            "name": "openpayu/openpayu",
+            "version": "2.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PayU-EMEA/openpayu_php.git",
+                "reference": "88f066e557c7cf5d2b37ad0d00fb7d245e061e7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PayU-EMEA/openpayu_php/zipball/88f066e557c7cf5d2b37ad0d00fb7d245e061e7e",
+                "reference": "88f066e557c7cf5d2b37ad0d00fb7d245e061e7e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-hash": "*",
+                "ext-json": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6.34"
+            },
+            "type": "library",
+            "extra": [
+                {
+                    "engine": "PHP SDK"
+                }
+            ],
+            "autoload": {
+                "classmap": [
+                    "lib/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "OpenPayU",
+                    "homepage": "http://developers.payu.com"
+                }
+            ],
+            "description": "OpenPayU PHP Library",
+            "support": {
+                "issues": "https://github.com/PayU/openpayu_php/issues",
+                "source": "https://github.com/PayU-EMEA/openpayu_php/tree/v2.4.0"
+            },
+            "time": "2026-04-24T11:42:47+00:00"
         },
         {
             "name": "phpoption/phpoption",
