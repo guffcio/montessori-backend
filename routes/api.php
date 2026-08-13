@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ParentController;
@@ -50,4 +51,13 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('/messages/{message}', [MessageController::class, 'update']);
     Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
     Route::post('/messages/{message}/notify/{recipient}', [MessageController::class, 'notify']);
+
+    Route::get('/invoices', [InvoiceController::class, 'index']);
+    Route::post('/invoices', [InvoiceController::class, 'store']);
+    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show']);
+    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf']);
+    Route::patch('/invoices/{invoice}/payment-status', [InvoiceController::class, 'updatePaymentStatus']);
+    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy']);
+    Route::post('/invoices/{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed();
+    Route::put('/invoices/{invoice}/reissue', [InvoiceController::class, 'reissue'])->withTrashed();
 });

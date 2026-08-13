@@ -17,7 +17,10 @@ return new class extends Migration
             $table->integer('month');
             $table->integer('last_sequence');
             $table->timestamps();
+
+            $table->unique(['year', 'month']);
         });
+
     }
 
     /**
