@@ -19,6 +19,8 @@ class InvoiceItem extends Model
         return [
             'type' => InvoiceItemType::class,
             'source' => InvoiceItemSource::class,
+            'unit_price' => 'decimal:2',
+            'total_price' => 'decimal:2',
         ];
     }
 

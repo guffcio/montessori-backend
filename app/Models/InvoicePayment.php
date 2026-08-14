@@ -15,6 +15,7 @@ class InvoicePayment extends Model
         return [
             'provider' => PaymentProvider::class,
             'provider_response' => 'array',
+            'amount' => 'decimal:2',
         ];
     }
 

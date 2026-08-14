@@ -20,13 +20,23 @@ class InvoiceItemFactory extends Factory
      */
     public function definition(): array
     {
-        $quantity = fake()->numberBetween(1, 20);
+        $type = fake()->randomElement(InvoiceItemType::cases());
+
         $unitPrice = fake()->randomFloat(2, 50, 500);
+
+        if (in_array($type, [
+            InvoiceItemType::ADVANCE,
+            InvoiceItemType::DISCOUNT,
+        ], true)) {
+            $unitPrice = -abs($unitPrice);
+        }
+
+        $quantity = fake()->numberBetween(1, 20);
 
         return [
             'invoice_id' => Invoice::factory(),
-            'type' => fake()->randomElement(InvoiceItemType::class),
-            'source' => fake()->randomElement(InvoiceItemSource::class),
+            'type' => $type,
+            'source' => fake()->randomElement(InvoiceItemSource::cases()),
             'name' => fake()->sentence(3),
             'quantity' => $quantity,
             'unit_price' => $unitPrice,

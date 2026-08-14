@@ -22,9 +22,9 @@ class ParentUserFactory extends Factory
             'user_id' => User::factory(),
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'street' => fake()->streetAddress(),
-            'house_number' => fake()->buildingNumber(),
-            'apartment_number' => fake()->buildingNumber(),
+            'street' => fake()->sentence(1),
+            'house_number' => fake()->randomNumber(2),
+            'apartment_number' => fake()->randomNumber(2),
             'postal_code' => fake()->postcode(),
             'city' => fake()->city(),
         ];
