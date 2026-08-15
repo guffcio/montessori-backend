@@ -1,6 +1,6 @@
 <?php
 
-use App\Jobs\SendMessageNotificationJob;
+use App\Jobs\Message\SendMessageNotificationJob;
 use App\MessageNotificationChannel;
 use App\MessageNotificationStatus;
 use App\Models\MessageNotification;

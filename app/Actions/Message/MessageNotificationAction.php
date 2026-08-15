@@ -2,7 +2,7 @@
 
 namespace App\Actions\Message;
 
-use App\Jobs\SendMessageNotificationJob;
+use App\Jobs\Message\SendMessageNotificationJob;
 use App\MessageNotificationStatus;
 use App\Models\MessageNotification;
 use App\Models\MessageRecipient;

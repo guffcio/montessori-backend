@@ -7,18 +7,20 @@ use App\InvoicePaymentStatus;
 use App\Policies\InvoicePolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
-#[Fillable('child_id', 'invoice_sequence', 'invoice_month', 'invoice_year', 'billing_date', 'issue_date', 'due_date', 'child_first_name', 'child_last_name', 'child_pesel', 'total_amount', 'payment_status', 'paid_at')]
+#[Fillable('child_id', 'pdf_path', 'invoice_sequence', 'invoice_month', 'invoice_year', 'billing_date', 'issue_date', 'due_date', 'child_first_name', 'child_last_name', 'child_pesel', 'total_amount', 'payment_status', 'paid_at')]
 #[UsePolicy(InvoicePolicy::class)]
 class Invoice extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected function casts(): array
     {
@@ -29,6 +31,13 @@ class Invoice extends Model
             'payment_status' => InvoicePaymentStatus::class,
             'total_amount' => 'decimal:2',
         ];
+    }
+
+    protected function number(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => $attributes['invoice_sequence'].'/'.$attributes['invoice_month'].'/'.$attributes['invoice_year']
+        );
     }
 
     public function child(): BelongsTo

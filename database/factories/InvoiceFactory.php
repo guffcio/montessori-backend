@@ -28,6 +28,7 @@ class InvoiceFactory extends Factory
 
         return [
             'child_id' => Child::factory(),
+            'pdf_path' => null,
             'invoice_sequence' => fake()->unique()->numberBetween(1, 999),
             'invoice_month' => $issueDate->month,
             'invoice_year' => $issueDate->year,

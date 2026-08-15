@@ -5,9 +5,9 @@ namespace App\Services\Invoice;
 use App\Models\InvoiceSequence;
 use Carbon\Carbon;
 
-class InvoiceSequenceService
+class InvoiceSequenceGenerator
 {
-    public function next(Carbon $issueDate): InvoiceSequence
+    public function generate(Carbon $issueDate): InvoiceSequence
     {
         $invoiceSequence = InvoiceSequence::where('year', $issueDate->year)
             ->where('month', $issueDate->month)

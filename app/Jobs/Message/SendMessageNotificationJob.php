@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Message;
 
 use App\Mail\Message\NewMessageMail;
 use App\MessageNotificationChannel;

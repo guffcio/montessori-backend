@@ -17,6 +17,6 @@ Jeśli przycisk nie działa, skopiuj i otwórz poniższy adres w przeglądarce:
 
 {{ $url }}
 
-Pozdrawiamy,<br>
+Z wyrazami szacunku,
 {{ config('app.name') }}
 </x-mail::message>

@@ -34,9 +34,11 @@ class NewMessageNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'message_id' => $this->message->id,
-            'title' => $this->message->title,
-            'sender_name' => 'Admin',
+            'type' => 'message',
+            'content_id' => $this->message->id,
+
+            'title' => 'Nowa wiadomość',
+            'subtitle' => $this->message->title,
         ];
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Child::class)->constrained()->onDelete('cascade');
+            $table->string('pdf_path')->nullable();
             $table->integer('invoice_sequence');
             $table->integer('invoice_month');
             $table->integer('invoice_year');

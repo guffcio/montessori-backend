@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Faktura VAT nr {{$invoice->invoice_sequence}}/{{$invoice->invoice_month}}/{{ $invoice->invoice_year }}</title>
+        <title>Faktura VAT nr {{$invoice->number}}</title>
 
         <style>
             @page {
@@ -39,7 +39,7 @@
         <div style="clear: both"></div>
 
         <div style="font-family: DejaVu Sans, sans-serif; padding-top: 10px">
-            <div style="font-size: 18px; font-weight: bold; text-align: center">FAKTURA VAT {{$invoice->invoice_sequence}}/{{$invoice->invoice_month}}/{{ $invoice->invoice_year }}</div>
+            <div style="font-size: 18px; font-weight: bold; text-align: center">FAKTURA VAT {{$invoice->number}}</div>
             <div style="font-size: 11px; text-align: center">kopia / oryginał *)</div>
 
             <div style="margin-top: 10px; font-family: DejaVu Sans">

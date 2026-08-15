@@ -4,23 +4,23 @@ namespace App\Actions\Invoice;
 
 use App\Data\Invoice\CreateInvoiceData;
 use App\Data\Invoice\GenerateInvoiceItemsData;
+use App\Jobs\Invoice\GenerateInvoicePdfJob;
 use App\Models\Child;
 use App\Models\Invoice;
 use App\Models\ParentUser;
 use App\Services\Invoice\InvoiceItemsGenerator;
-use App\Services\Invoice\InvoiceSequenceService;
+use App\Services\Invoice\InvoiceSequenceGenerator;
 use Illuminate\Support\Facades\DB;
 
 class CreateInvoiceAction
 {
     public function __construct(
-        private InvoiceSequenceService $sequenceService,
-        private InvoiceItemsGenerator $itemsGenerator
+        private InvoiceSequenceGenerator $sequenceGenerator,
+        private InvoiceItemsGenerator $itemsGenerator,
     ) {}
 
     public function execute(CreateInvoiceData $dto): Invoice
     {
-
         $child = Child::with(['parents', 'zone'])
             ->findOrFail($dto->childId);
 
@@ -37,7 +37,7 @@ class CreateInvoiceAction
 
         $invoice = DB::transaction(function () use ($dto, $child, $items) {
 
-            $invoiceSequence = $this->sequenceService->next($dto->issueDate);
+            $invoiceSequence = $this->sequenceGenerator->generate($dto->issueDate);
 
             $invoice = Invoice::create([
                 'child_id' => $child->id,
@@ -75,7 +75,7 @@ class CreateInvoiceAction
             return $invoice;
         });
 
-        // TODO: GENERATE PDF WITH NEW INVOICE AND POSSIBLY PAYU PAYMENT AND SEND THAT TO ALL PARENTS OF CHILD
+        GenerateInvoicePdfJob::dispatch($invoice);
 
         return $invoice;
     }

@@ -26,13 +26,18 @@ class InvoiceItemsGenerator
         GenerateInvoiceItemsData $dto
     ): array {
 
-        return [
+        $items = [
             $this->generateFeeItem($child, $dto->billingDate, $dto->monthlyFee),
             $this->generateMealItem($child, $dto->billingDate, $dto->holidayDaysCount),
-            $this->generateAdvanceMealItem($child, $dto->billingDate),
             ...$this->generateCustomItems($dto->items),
             ...$this->generateDiscountItems($dto->discounts),
         ];
+
+        if ($advanceItem = $this->generateAdvanceMealItem($child, $dto->billingDate)) {
+            $items[] = $advanceItem;
+        }
+
+        return $items;
     }
 
     private function makeItem(array $data): array
@@ -67,7 +72,7 @@ class InvoiceItemsGenerator
         ]);
     }
 
-    private function generateAdvanceMealItem(Child $child, Carbon $billingDate): array
+    private function generateAdvanceMealItem(Child $child, Carbon $billingDate): ?array
     {
         $advanceBillingDate = $billingDate->copy()->subMonth();
 
@@ -76,6 +81,10 @@ class InvoiceItemsGenerator
             ->whereYear('absent_at', $advanceBillingDate->year)
             ->where('charge_catering', false)
             ->count();
+
+        if ($advanceCateringQuantity <= 0) {
+            return null;
+        }
 
         return $this->makeItem([
             'type' => InvoiceItemType::ADVANCE,
