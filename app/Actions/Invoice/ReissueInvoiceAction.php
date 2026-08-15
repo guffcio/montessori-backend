@@ -5,6 +5,7 @@ namespace App\Actions\Invoice;
 use App\Data\Invoice\GenerateInvoiceItemsData;
 use App\Data\Invoice\ReissueInvoiceData;
 use App\Exceptions\Invoice\InvoiceCannotBeReissuedException;
+use App\Jobs\Invoice\GenerateInvoicePdfJob;
 use App\Models\Child;
 use App\Models\Invoice;
 use App\Models\ParentUser;
@@ -72,7 +73,7 @@ class ReissueInvoiceAction
             return $invoice->fresh();
         });
 
-        // TODO: GENERATE PDF WITH NEW INVOICE AND POSSIBLY PAYU PAYMENT AND SEND THAT TO ALL PARENTS OF CHILD
+        GenerateInvoicePdfJob::dispatch($invoice);
 
         return $invoice;
     }
