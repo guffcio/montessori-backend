@@ -16,6 +16,7 @@ use App\Http\Resources\InvoiceResource;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
 {
@@ -64,7 +65,14 @@ class InvoiceController extends Controller
 
         Gate::authorize('view', $invoice);
 
-        // TODO: GENERATE PDF AND SHOW IT
+        $path = $invoice->pdf_path;
+
+        abort_unless($path && Storage::disk('local')->exists($path), 404);
+
+        return response()->file(Storage::disk('local')->path($path), [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="Faktura VAT '.$invoice->number.'.pdf"',
+        ]);
 
     }
 
