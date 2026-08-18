@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Faktura VAT nr {{$invoice->number}}</title>
+        <title>Faktura VAT nr {{$data->invoice->number}}</title>
 
         <style>
             @page {
@@ -39,14 +39,14 @@
         <div style="clear: both"></div>
 
         <div style="font-family: DejaVu Sans, sans-serif; padding-top: 10px">
-            <div style="font-size: 18px; font-weight: bold; text-align: center">FAKTURA VAT {{$invoice->number}}</div>
+            <div style="font-size: 18px; font-weight: bold; text-align: center">FAKTURA VAT {{$data->invoice->number}}</div>
             <div style="font-size: 11px; text-align: center">kopia / oryginał *)</div>
 
             <div style="margin-top: 10px; font-family: DejaVu Sans">
                 <div style="width: 50%; float: left">
                     <div style="font-size: 11px">
                         <span style="font-size: 11px; font-style: italic; line-height: 20px">Nabywca:<br /></span>
-                        @foreach ($invoice->parentSnapshots as $parentSnapshot)
+                        @foreach ($data->invoice->parentSnapshots as $parentSnapshot)
                             {{ $parentSnapshot->first_name }} {{ $parentSnapshot->last_name }}
                             <br />
                             Adres:
@@ -61,14 +61,14 @@
                 </div>
                 <div style="width: 50%; float: left">
                     <div style="font-size: 11px; text-align: right">
-                        <span style="font-size: 11px; font-style: italic">Data wystawienia:</span> {{$invoice->issue_date->format('Y-m-d')}}<br />
-                        <span style="font-size: 11px; font-style: italic">Za okres:</span> {{ $billingMonthName }} {{ $invoice->billing_date->year }}
+                        <span style="font-size: 11px; font-style: italic">Data wystawienia:</span> {{$data->invoice->issue_date->format('Y-m-d')}}<br />
+                        <span style="font-size: 11px; font-style: italic">Za okres:</span> {{ $data->billingMonthName }} {{ $data->invoice->billing_date->year }}
 
                         <div style="text-align: right; margin-top: 10px">
                             <span style="font-size: 11px; font-style: italic;">Sposób zapłaty:</span>
                             przelew / karta *)<br />
                             <span style="font-size: 11px; font-style: italic;">Termin zapłaty:</span>
-                            {{ $invoice->due_date->format('Y-m-d') }}
+                            {{ $data->invoice->due_date->format('Y-m-d') }}
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                  
                     @endphp
 
-                    @foreach ($chargeAndDiscountItems as $item)
+                    @foreach ($data->chargeAndDiscountItems as $item)
                         <x-pdf.invoice-item-row
                             :item="$item"
                             :index="$loop->iteration"
@@ -177,7 +177,7 @@
                                     width:13%;
                                 "
                             >
-                                {{ $invoice->subtotalBeforeAdvances()}} zł
+                                {{ $data->invoice->subtotalBeforeAdvances()}} zł
                             </td>
                         </tr>
 
@@ -229,7 +229,7 @@
                             </td>
                         </tr>
 
-                        @foreach ($advanceItems as $item)
+                        @foreach ($data->advanceItems as $item)
                             <x-pdf.invoice-advance-item-row :item="$item" />
                         @endforeach
                     </tbody>
@@ -239,10 +239,10 @@
             <div style="margin-top: 20px">
                 <div style="font-size: 13px">
                     <span style="font-size: 13px; font-style: italic">Słownie:</span>
-                    {{ $amountInWords }}
+                    {{ $data->amountInWords }}
                 </div>
                 <div style="text-decoration: underline; font-size: 18px; font-weight: bold; margin-top: 5px">
-                    Do zapłaty: {{ $invoice->total_amount }} zł
+                    Do zapłaty: {{ $data->invoice->total_amount }} zł
                 </div>
             </div>
 
