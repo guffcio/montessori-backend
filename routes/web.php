@@ -8,14 +8,14 @@ use App\Models\Invoice;
 use App\Models\MessageRecipient;
 use App\Models\ParentUser;
 use App\Services\CalendarService;
-use App\Support\MoneyToWordsConverter;
+use App\Services\MoneyToWordsConverter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPdf\Facades\Pdf;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('welcome');
+});
 
 // Route::get('/test-mail', function () {
 //     $recipient = MessageRecipient::with(['user', 'message'])->first();

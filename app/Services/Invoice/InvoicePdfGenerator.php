@@ -4,7 +4,7 @@ namespace App\Services\Invoice;
 
 use App\Models\Invoice;
 use App\Services\CalendarService;
-use App\Support\MoneyToWordsConverter;
+use App\Services\MoneyToWordsConverter;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 class InvoicePdfGenerator
