@@ -3,9 +3,9 @@
 namespace App\Data\Invoice;
 
 use App\Models\Invoice;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
-class InvoicePdfData
+final readonly class InvoicePdfData
 {
     public function __construct(
         public Invoice $invoice,

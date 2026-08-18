@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Invoice\CreateInvoiceAction;
+use App\Actions\Invoice\PreviewInvoiceAction;
 use App\Actions\Invoice\ReissueInvoiceAction;
 use App\Actions\Invoice\UpdateInvoicePaymentStatusAction;
 use App\Data\Invoice\CreateInvoiceData;
@@ -15,8 +16,10 @@ use App\Http\Requests\UpdateInvoicePaymentStatusRequest;
 use App\Http\Resources\InvoiceResource;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
+use App\Services\Invoice\InvoicePdfGenerator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Spatie\LaravelPdf\PdfBuilder;
 
 class InvoiceController extends Controller
 {
@@ -30,6 +33,20 @@ class InvoiceController extends Controller
         $invoices = Invoice::all();
 
         return InvoiceResource::collection($invoices);
+    }
+
+    /**
+     * Preview a newly created resource.
+     */
+    public function preview(StoreInvoiceRequest $request, PreviewInvoiceAction $action, InvoicePdfGenerator $invoicePdfGenerator): PdfBuilder
+    {
+        Gate::authorize('create', Invoice::class);
+
+        $dto = CreateInvoiceData::fromArray($request->validated());
+
+        $invoice = $action->execute($dto);
+
+        return $invoicePdfGenerator->build($invoice);
     }
 
     /**

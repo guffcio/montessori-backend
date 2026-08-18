@@ -5,6 +5,9 @@ namespace App\Services\Invoice;
 use App\Factories\InvoicePdfDataFactory;
 use App\Models\Invoice;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
+
+use function Spatie\LaravelPdf\Support\pdf;
 
 class InvoicePdfGenerator
 {
@@ -24,5 +27,14 @@ class InvoicePdfGenerator
             ->save($path);
 
         return $path;
+    }
+
+    public function build(Invoice $invoice): PdfBuilder
+    {
+        return pdf()
+            ->view('pdfs.invoice', [
+                'data' => $this->invoicePdfDataFactory->fromInvoice($invoice),
+            ])
+            ->name('invoice-preview.pdf');
     }
 }

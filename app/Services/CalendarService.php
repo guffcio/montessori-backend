@@ -8,14 +8,14 @@ class CalendarService
 {
     public function getWorkdaysCount(Carbon $date): int
     {
-        $startOfMonth = Carbon::createFromDate($date->year, $date->month)->startOfMonth();
-        $endOfMonth = Carbon::createFromDate($date->year, $date->month)->endOfMonth();
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
 
-        $workingDays = $startOfMonth->diffInDaysFiltered(function (Carbon $date) {
-            return $date->isWeekday();
-        }, $endOfMonth->addDay());
+        return $startOfMonth->diffInDaysFiltered(
+            fn (Carbon $date) => $date->isWeekday(),
+            $endOfMonth
+        );
 
-        return $workingDays;
     }
 
     public function getMonthName(Carbon $date): string

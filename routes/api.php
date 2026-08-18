@@ -53,6 +53,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/messages/{message}/notify/{recipient}', [MessageController::class, 'notify']);
 
     Route::get('/invoices', [InvoiceController::class, 'index']);
+    Route::get('/invoices/preview', [InvoiceController::class, 'preview']);
     Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show']);
     Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf']);
