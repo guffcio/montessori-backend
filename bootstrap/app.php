@@ -6,6 +6,8 @@ use App\Exceptions\Invoice\InvoiceCannotBeDeletedException;
 use App\Exceptions\Invoice\InvoiceCannotBeReissuedException;
 use App\Exceptions\Invoice\InvoiceCannotBeRestoredException;
 use App\Exceptions\InvoiceAlreadyUnpaidException;
+use App\Exceptions\PaymentCancellationException;
+use App\Exceptions\PaymentCreateException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -59,6 +61,18 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (InvoiceCannotBeReissuedException $e) {
             return response()->json([
                 'message' => 'Invoice cannot be reissued',
+            ], 422);
+        });
+
+        $exceptions->render(function (PaymentCreateException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        });
+
+        $exceptions->render(function (PaymentCancellationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
             ], 422);
         });
     })->create();

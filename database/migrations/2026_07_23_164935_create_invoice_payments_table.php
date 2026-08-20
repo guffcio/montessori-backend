@@ -18,13 +18,12 @@ return new class extends Migration
             $table->foreignIdFor(Invoice::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
             $table->string('provider');
-            $table->string('provider_order_id')->unique();
+            $table->string('provider_order_id')->unique()->nullable();
             $table->decimal('amount', 10, 2);
-            $table->string('payment_url');
-            $table->string('status');
+            $table->string('payment_url')->nullable();
+            $table->string('provider_status');
             $table->json('provider_response')->nullable();
             $table->timestamp('paid_at')->nullable();
-            $table->timestamp('finished_at')->nullable();
             $table->timestamps();
         });
     }

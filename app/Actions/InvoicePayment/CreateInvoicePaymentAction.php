@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Actions\InvoicePayment;
+
+use App\Factories\PaymentServiceFactory;
+use App\InvoicePaymentMethod;
+use App\InvoicePaymentStatus;
+use App\Mail\InvoicePayment\InvoicePaymentCreatedMail;
+use App\Models\Invoice;
+use App\Models\InvoicePayment;
+use App\Models\User;
+use App\PaymentProvider;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+
+class CreateInvoicePaymentAction
+{
+    public function __construct(
+        private PaymentServiceFactory $paymentFactory,
+    ) {}
+
+    public function execute(PaymentProvider $provider, Invoice $invoice): string
+    {
+        $paymentService = $this->paymentFactory->make($provider);
+
+        $order = [];
+
+        $order['description'] = "Płatność za fakturę {$invoice->number}";
+        $order['totalAmount'] = $invoice->total_amount * 100;
+        $order['extOrderId'] = $invoice->id;
+
+        $order['products'][0]['name'] = "Faktura VAT nr {$invoice->number}";
+        $order['products'][0]['unitPrice'] = $invoice->total_amount * 100;
+        $order['products'][0]['quantity'] = 1;
+
+        $user = User::auth();
+        $order['buyer']['email'] = $user->email;
+        $order['buyer']['phone'] = $user->phone;
+        $order['buyer']['firstName'] = $user->parent->first_name;
+        $order['buyer']['lastName'] = $user->parent->last_name;
+        $order['buyer']['language'] = 'pl';
+
+        $invoicePayment = DB::transaction(function () use ($provider, $invoice, $paymentService, $order) {
+            $invoicePayment = InvoicePayment::for($invoice)::create([
+                'user_id' => Auth::id(),
+                'provider' => $provider,
+                'amount' => $invoice->total_amount,
+                'provider_status' => 'NEW',
+            ]);
+
+            $data = $paymentService->createPayment($order);
+
+            $invoicePayment->update([
+                'provider_order_id' => $data->providerOrderId,
+                'payment_url' => $data->redirectUrl,
+                'provider_response' => $data->providerResponse,
+            ]);
+
+            $invoice->update([
+                'payment_status' => InvoicePaymentStatus::PENDING,
+                'payment_method' => InvoicePaymentMethod::ONLINE,
+            ]);
+
+            return $invoicePayment;
+        });
+
+        Mail::to(Auth::user())->send(new InvoicePaymentCreatedMail($invoicePayment));
+
+        return $invoicePayment->redirectUrl;
+
+    }
+}

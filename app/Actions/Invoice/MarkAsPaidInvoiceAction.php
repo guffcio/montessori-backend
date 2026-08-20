@@ -7,6 +7,9 @@ use App\Factories\PaymentServiceFactory;
 use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
+use App\PaymentProvider;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MarkAsPaidInvoiceAction
 {
@@ -33,10 +36,20 @@ class MarkAsPaidInvoiceAction
             );
         }
 
-        $invoice->update([
-            'payment_method' => $newPaymentMethod,
-            'payment_status' => InvoicePaymentStatus::PAID,
-        ]);
+        DB::transaction(function () use ($invoice, $newPaymentMethod) {
+            $invoice->update([
+                'payment_method' => $newPaymentMethod,
+                'payment_status' => InvoicePaymentStatus::PAID,
+            ]);
+
+            $invoice->payments()->create([
+                'user_id' => Auth::id(),
+                'provider' => PaymentProvider::MANUAL,
+                'amount' => $invoice->total_amount,
+                'status' => 'COMPLETED',
+                'paid_at' => now(),
+            ]);
+        });
 
         return $invoice->fresh();
     }

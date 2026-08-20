@@ -1,0 +1,12 @@
+<x-mail::message>
+Szanowni Państwo,
+
+informujemy, że płatność PayU za fakturę **{{$invoicePayment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”** została anulowana.
+
+Jeżeli anulowanie było niezamierzone lub chcą Państwo ponowić płatność, prosimy o ponowne skorzystanie z panelu rodzica.
+
+Dziękujemy i pozostajemy do Państwa dyspozycji w razie pytań.
+
+Z wyrazami szacunku,
+{{ config('app.name') }}
+</x-mail::message>
