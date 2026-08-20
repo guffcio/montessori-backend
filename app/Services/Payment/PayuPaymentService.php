@@ -15,13 +15,14 @@ class PayuPaymentService implements PaymentServiceInterface
         // TODO: CANCEL PAYMENT OPEN PAYU SDK
     }
 
-    public function canBeCancelled(string $status): bool
+    public function isCancelable(string $status): bool
     {
         return in_array(
             $status,
             [
                 PayuPaymentStatus::NEW,
                 PayuPaymentStatus::PENDING,
+                PayuPaymentStatus::WAITING_FOR_CONFIRMATION,
             ],
             true
         );

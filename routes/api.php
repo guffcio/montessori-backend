@@ -54,11 +54,12 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/invoices', [InvoiceController::class, 'index']);
     Route::get('/invoices/preview', [InvoiceController::class, 'preview']);
-    Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show']);
     Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf']);
-    Route::patch('/invoices/{invoice}/payment-status', [InvoiceController::class, 'updatePaymentStatus']);
-    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy']);
+    Route::post('/invoices', [InvoiceController::class, 'store']);
+    Route::post('/invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid']);
+    Route::post('/invoices/{invoice}/mark-as-unpaid', [InvoiceController::class, 'markAsUnpaid']);
     Route::post('/invoices/{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed();
     Route::put('/invoices/{invoice}/reissue', [InvoiceController::class, 'reissue'])->withTrashed();
+    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy']);
 });

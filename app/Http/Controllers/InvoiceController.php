@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Invoice\CreateInvoiceAction;
+use App\Actions\Invoice\MarkAsPaidInvoiceAction;
+use App\Actions\Invoice\MarkAsUnpaidInvoiceAction;
 use App\Actions\Invoice\PreviewInvoiceAction;
 use App\Actions\Invoice\ReissueInvoiceAction;
-use App\Actions\Invoice\UpdateInvoicePaymentStatusAction;
 use App\Data\Invoice\CreateInvoiceData;
 use App\Data\Invoice\ReissueInvoiceData;
 use App\Exceptions\Invoice\InvoiceCannotBeDeletedException;
 use App\Exceptions\Invoice\InvoiceCannotBeRestoredException;
+use App\Http\Requests\MarkAsPaidInvoiceRequest;
 use App\Http\Requests\ReissueInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
-use App\Http\Requests\UpdateInvoicePaymentStatusRequest;
 use App\Http\Resources\InvoiceResource;
-use App\InvoicePaymentStatus;
+use App\InvoicePaymentMethod;
 use App\Models\Invoice;
 use App\Services\Invoice\InvoicePdfGenerator;
 use Illuminate\Support\Facades\Gate;
@@ -94,17 +95,34 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the payment status in storage.
      */
-    public function updatePaymentStatus(
-        UpdateInvoicePaymentStatusRequest $request,
+    public function markAsPaid(
+        MarkAsPaidInvoiceRequest $request,
         Invoice $invoice,
-        UpdateInvoicePaymentStatusAction $action
+        MarkAsPaidInvoiceAction $action
     ): InvoiceResource {
 
         Gate::authorize('update', $invoice);
 
-        $updatedInvoice = $action->execute($invoice, InvoicePaymentStatus::from($request->validated('payment_status')));
+        $updatedInvoice = $action->execute($invoice, InvoicePaymentMethod::from($request->validated('payment_method')));
+
+        return new InvoiceResource($updatedInvoice);
+
+    }
+
+    /**
+     * Update the payment status in storage.
+     */
+    public function markAsUnpaid(
+        $request,
+        Invoice $invoice,
+        MarkAsUnpaidInvoiceAction $action
+    ): InvoiceResource {
+
+        Gate::authorize('update', $invoice);
+
+        $updatedInvoice = $action->execute($invoice);
 
         return new InvoiceResource($updatedInvoice);
 

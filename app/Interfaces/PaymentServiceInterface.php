@@ -8,5 +8,5 @@ interface PaymentServiceInterface
 
     public function cancelPayment(string $providerOrderId);
 
-    public function canBeCancelled(string $status);
+    public function isCancelable(string $status);
 }

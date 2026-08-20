@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\InvoiceItemType;
+use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Policies\InvoicePolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
-#[Fillable('child_id', 'pdf_path', 'invoice_sequence', 'invoice_month', 'invoice_year', 'billing_date', 'issue_date', 'due_date', 'child_first_name', 'child_last_name', 'child_pesel', 'total_amount', 'payment_status', 'paid_at')]
+#[Fillable('child_id', 'pdf_path', 'invoice_sequence', 'invoice_month', 'invoice_year', 'billing_date', 'issue_date', 'due_date', 'child_first_name', 'child_last_name', 'child_pesel', 'total_amount', 'payment_status', 'payment_method', 'paid_at')]
 #[UsePolicy(InvoicePolicy::class)]
 class Invoice extends Model
 {
@@ -29,6 +30,7 @@ class Invoice extends Model
             'issue_date' => 'date',
             'due_date' => 'date',
             'payment_status' => InvoicePaymentStatus::class,
+            'payment_method' => InvoicePaymentMethod::class,
             'total_amount' => 'decimal:2',
         ];
     }

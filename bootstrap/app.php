@@ -1,9 +1,11 @@
 <?php
 
+use App\Exceptions\CannotMarkOnlinePaymentAsUnpaidException;
 use App\Exceptions\Invoice\InvoiceAlreadyPaidException;
 use App\Exceptions\Invoice\InvoiceCannotBeDeletedException;
 use App\Exceptions\Invoice\InvoiceCannotBeReissuedException;
 use App\Exceptions\Invoice\InvoiceCannotBeRestoredException;
+use App\Exceptions\InvoiceAlreadyUnpaidException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -26,7 +28,19 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (InvoiceAlreadyPaidException $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'Invoice is already paid',
+            ], 422);
+        });
+
+        $exceptions->render(function (InvoiceAlreadyUnpaidException $e) {
+            return response()->json([
+                'message' => 'Invoice is already unpaid',
+            ], 422);
+        });
+
+        $exceptions->render(function (CannotMarkOnlinePaymentAsUnpaidException $e) {
+            return response()->json([
+                'message' => 'Cannot mark online payment as unpaid',
             ], 422);
         });
 

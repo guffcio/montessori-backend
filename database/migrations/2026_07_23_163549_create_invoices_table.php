@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('child_pesel', 11);
             $table->decimal('total_amount', 8, 2);
             $table->string('payment_status')->default(InvoicePaymentStatus::UNPAID->value);
+            $table->string('payment_method')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
