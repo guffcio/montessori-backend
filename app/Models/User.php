@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -65,9 +66,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Absence::class, 'reported_by_user_id');
     }
 
-    public function payments(): HasMany
+    public function payments(): MorphMany
     {
-        return $this->hasMany(InvoicePayment::class);
+        return $this->morphMany(Payment::class, 'payable');
     }
 
     public function sentMessages(): HasMany

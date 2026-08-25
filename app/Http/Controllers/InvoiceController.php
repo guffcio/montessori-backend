@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Invoice\CreateInvoiceAction;
+use App\Actions\Invoice\CreateInvoicePaymentAction;
 use App\Actions\Invoice\MarkAsPaidInvoiceAction;
 use App\Actions\Invoice\MarkAsUnpaidInvoiceAction;
 use App\Actions\Invoice\PreviewInvoiceAction;
@@ -13,11 +14,13 @@ use App\Exceptions\Invoice\InvoiceCannotBeDeletedException;
 use App\Exceptions\Invoice\InvoiceCannotBeRestoredException;
 use App\Http\Requests\MarkAsPaidInvoiceRequest;
 use App\Http\Requests\ReissueInvoiceRequest;
+use App\Http\Requests\StoreInvoicePaymentRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\InvoicePaymentMethod;
 use App\Models\Invoice;
 use App\Services\Invoice\InvoicePdfGenerator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPdf\PdfBuilder;
@@ -172,5 +175,22 @@ class InvoiceController extends Controller
         $reissuedInvoice = $action->execute($invoice, $dto);
 
         return new InvoiceResource($reissuedInvoice);
+    }
+
+    /**
+     * Store a newly created payment of resource in storage.
+     */
+    public function pay(StoreInvoicePaymentRequest $request, Invoice $invoice, CreateInvoicePaymentAction $action): JsonResponse
+    {
+        Gate::authorize('pay', $invoice);
+
+        $redirectUrl = $action->execute($request->validated(), $invoice);
+
+        return response()->json([
+            'data' => [
+                'redirectUrl' => $redirectUrl,
+            ],
+        ]);
+
     }
 }

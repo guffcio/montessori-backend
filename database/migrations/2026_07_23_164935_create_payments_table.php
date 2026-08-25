@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,15 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoice_payments', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Invoice::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
+            $table->morphs('payable');
+            $table->foreignIdFor(User::class)->constrained()->onDelete('set null')->nullable();
             $table->string('provider');
             $table->string('provider_order_id')->unique()->nullable();
             $table->decimal('amount', 10, 2);
             $table->string('payment_url')->nullable();
-            $table->string('provider_status');
+            $table->string('status');
+            $table->string('provider_status')->nullable();
             $table->json('provider_response')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoice_payments');
+        Schema::dropIfExists('payments');
     }
 };

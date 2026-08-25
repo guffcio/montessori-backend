@@ -1,16 +1,15 @@
 <?php
 
-namespace Api\Actions\Payment;
+namespace App\Actions\Payment;
 
 use App\Data\Payment\PaymentWebhookData;
+use App\Events\Payment\PaymentCanceled;
+use App\Events\Payment\PaymentCompleted;
+use App\Events\Payment\PaymentRejected;
 use App\Interfaces\PaymentServiceInterface;
-use App\InvoicePaymentStatus;
-use App\Mail\InvoicePayment\InvoicePaymentCanceledMail;
-use App\Mail\InvoicePayment\InvoicePaymentCompletedMail;
-use App\Mail\InvoicePayment\InvoicePaymentRejectedMail;
-use App\Models\InvoicePayment;
+use App\Models\Payment;
+use App\PaymentStatus;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class ProcessPaymentWebhookAction
 {
@@ -18,8 +17,7 @@ class ProcessPaymentWebhookAction
 
     public function execute(PaymentWebhookData $data, PaymentServiceInterface $paymentService): void
     {
-        $payment = InvoicePayment::query()
-            ->with(['invoice', 'user'])
+        $payment = Payment::query()
             ->where('provider_order_id', $data->providerOrderId)
             ->firstOrFail();
 
@@ -27,41 +25,45 @@ class ProcessPaymentWebhookAction
             return;
         }
 
-        $status = $data->providerStatus;
+        DB::transaction(function () use ($paymentService, $data, $payment) {
 
-        $payment->provider_status = $status;
-        $payment->provider_response = $data->providerResponse;
+            $payment->update([
+                'status' => PaymentStatus::PENDING,
+                'provider_status' => $data->providerStatus,
+                'provider_response' => $data->providerResponse,
+            ]);
 
-        if (
-            $paymentService->isCanceled($status) ||
-            $paymentService->isRejected($status)
-        ) {
-            $payment->invoice->payment_status = InvoicePaymentStatus::UNPAID;
-            $payment->invoice->payment_method = null;
-        }
+            if ($paymentService->isCanceled($data->providerStatus)) {
+                $payment->update([
+                    'status' => PaymentStatus::CANCELED,
+                ]);
 
-        if ($paymentService->isCompleted($status)) {
-            $payment->paid_at = now();
-            $payment->invoice->payment_status = InvoicePaymentStatus::PAID;
-        }
+                PaymentCanceled::dispatch($payment);
 
-        DB::transaction(function () use ($payment) {
-            $payment->saveOrFail();
-            $payment->invoice->saveOrFail();
+                return;
+            }
+
+            if ($paymentService->isRejected($data->providerStatus)) {
+                $payment->update([
+                    'status' => PaymentStatus::REJECTED,
+                ]);
+
+                PaymentRejected::dispatch($payment);
+
+                return;
+            }
+
+            if ($paymentService->isCompleted($data->providerStatus)) {
+                $payment->update([
+                    'paid_at' => now(),
+                    'status' => PaymentStatus::COMPLETED,
+                ]);
+
+                PaymentCompleted::dispatch($payment);
+
+                return;
+            }
         });
 
-        if ($paymentService->isCanceled($status)) {
-            Mail::to($payment->user->email)->queue(
-                new InvoicePaymentCanceledMail($payment)
-            );
-        } elseif ($paymentService->isRejected($status)) {
-            Mail::to($payment->user->email)->queue(
-                new InvoicePaymentRejectedMail($payment)
-            );
-        } elseif ($paymentService->isCompleted($status)) {
-            Mail::to($payment->user->email)->queue(
-                new InvoicePaymentCompletedMail($payment)
-            );
-        }
     }
 }

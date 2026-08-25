@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Api\Actions\Payment\ProcessPaymentWebhookAction;
+use App\Actions\Payment\ProcessPaymentWebhookAction;
 use App\Factories\PaymentServiceFactory;
 use App\PaymentProvider;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class PaymentController extends Controller
         $paymentService = $this->paymentFactory
             ->make($provider);
 
-        $data = $paymentService->handleWebhook($request);
+        $data = $paymentService->handleWebhook($request->getContent());
 
         $action->execute($data, $paymentService);
 

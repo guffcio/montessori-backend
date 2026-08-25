@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Actions\InvoicePayment;
+namespace App\Actions\Invoice;
 
 use App\Factories\PaymentServiceFactory;
 use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
-use App\Mail\InvoicePayment\InvoicePaymentCreatedMail;
+use App\Mail\Invoice\InvoicePaymentCreatedMail;
 use App\Models\Invoice;
-use App\Models\InvoicePayment;
+use App\Models\Payment;
 use App\Models\User;
 use App\PaymentProvider;
+use App\PaymentStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -41,20 +42,16 @@ class CreateInvoicePaymentAction
         $order['buyer']['lastName'] = $user->parent->last_name;
         $order['buyer']['language'] = 'pl';
 
-        $invoicePayment = DB::transaction(function () use ($provider, $invoice, $paymentService, $order) {
-            $invoicePayment = InvoicePayment::for($invoice)::create([
+        $providerData = $paymentService->createPayment($order);
+
+        $invoicePayment = DB::transaction(function () use ($provider, $invoice, $providerData) {
+            $invoicePayment = Payment::for($invoice)::create([
                 'user_id' => Auth::id(),
                 'provider' => $provider,
+                'provider_order_id' => $providerData->providerOrderId,
+                'payment_url' => $providerData->redirectUrl,
                 'amount' => $invoice->total_amount,
-                'provider_status' => 'NEW',
-            ]);
-
-            $data = $paymentService->createPayment($order);
-
-            $invoicePayment->update([
-                'provider_order_id' => $data->providerOrderId,
-                'payment_url' => $data->redirectUrl,
-                'provider_response' => $data->providerResponse,
+                'status' => PaymentStatus::NEW,
             ]);
 
             $invoice->update([

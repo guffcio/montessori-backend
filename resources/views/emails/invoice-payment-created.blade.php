@@ -1,17 +1,17 @@
 <x-mail::message>
 Szanowni Państwo,
 
-informujemy, że rozpoczęli Państwo proces płatności za fakturę **{{$invoicePayment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”**, jednak nie został on jeszcze zakończony.
+informujemy, że rozpoczęli Państwo proces płatności za fakturę **{{$payment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”**, jednak nie został on jeszcze zakończony.
         
 Jeśli doszło do utraty połączenia, zamknięcia okna lub chcą Państwo po prostu ponowić płatność, mogą Państwo dokończyć ją, korzystając z poniższego przycisku:
 
-<x-mail::button class="button-init" :url="$invoicePayment->redirectUrl">
+<x-mail::button class="button-init" :url="$payment->redirectUrl">
 Przejdź do wiadomości
 </x-mail::button>
 
 Jeśli przycisk nie działa, skopiuj i otwórz poniższy adres w przeglądarce:
 
-{{ $invoicePayment->redirectUrl }}
+{{ $payment->redirectUrl }}
 
 W przypadku pytań dotyczących płatności lub rozliczeń, prosimy o kontakt z administracją przedszkola.
 

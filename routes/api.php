@@ -4,7 +4,6 @@ use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\InvoicePaymentController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ParentController;
@@ -62,9 +61,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid']);
     Route::post('/invoices/{invoice}/mark-as-unpaid', [InvoiceController::class, 'markAsUnpaid']);
     Route::post('/invoices/{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed();
+    Route::post('/invoices/{invoice}/payments', [InvoiceController::class, 'pay']);
     Route::put('/invoices/{invoice}/reissue', [InvoiceController::class, 'reissue'])->withTrashed();
     Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy']);
 
-    Route::post('/invoices/{invoice}/payments', [InvoicePaymentController::class, 'store']);
     Route::post('/payments/{provider}/notify', [PaymentController::class, 'notify'])->name('payments.notify');
 });

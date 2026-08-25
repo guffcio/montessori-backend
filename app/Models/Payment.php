@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use App\PaymentProvider;
-use App\Policies\InvoicePaymentPolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable('invoice_id', 'user_id', 'provider', 'provider_order_id', 'amount', 'payment_url', 'provider_status', 'provider_response', 'paid_at')]
-#[UsePolicy(InvoicePaymentPolicy::class)]
-class InvoicePayment extends Model
+#[Fillable('invoice_id', 'user_id', 'provider', 'provider_order_id', 'amount', 'payment_url', 'status', 'provider_status', 'provider_response', 'paid_at')]
+class Payment extends Model
 {
     protected function casts(): array
     {
@@ -22,9 +20,9 @@ class InvoicePayment extends Model
         ];
     }
 
-    public function invoice(): BelongsTo
+    public function payable(): MorphTo
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->morphTo();
     }
 
     public function user(): BelongsTo

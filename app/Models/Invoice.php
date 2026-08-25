@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -57,9 +58,9 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
-    public function payments(): HasMany
+    public function payments(): MorphMany
     {
-        return $this->hasMany(InvoicePayment::class);
+        return $this->morphMany(Payment::class, 'payable');
     }
 
     public function canBeRestored(): bool

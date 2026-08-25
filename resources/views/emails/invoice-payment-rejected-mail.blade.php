@@ -1,7 +1,7 @@
 <x-mail::message>
 Szanowni Państwo,
 
-informujemy, że płatność PayU za fakturę **{{$invoicePayment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”** została odrzucona.
+informujemy, że płatność PayU za fakturę **{{$payment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”** została odrzucona.
 
 Aby ponowić płatność prosimy o ponowne skorzystanie z panelu rodzica.
 

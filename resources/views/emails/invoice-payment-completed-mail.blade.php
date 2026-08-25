@@ -1,7 +1,7 @@
 <x-mail::message>
 Szanowni Państwo,
 
-potwierdzamy otrzymanie płatności za wystawioną fakturę **{{$invoicePayment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”**.
+potwierdzamy otrzymanie płatności za wystawioną fakturę **{{$payment->invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”**.
 
 Dziękujemy za terminowe uregulowanie należności.
 

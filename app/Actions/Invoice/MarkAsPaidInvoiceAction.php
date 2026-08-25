@@ -8,6 +8,7 @@ use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
 use App\PaymentProvider;
+use App\PaymentStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -27,16 +28,22 @@ class MarkAsPaidInvoiceAction
         foreach ($invoice->payments as $payment) {
             $service = $this->paymentFactory->make($payment->provider);
 
-            if (! $service->isCancelable($payment->status)) {
+            if (! $service->isCancelable($payment->provider_status)) {
                 continue;
             }
 
             $service->cancelPayment(
                 $payment->provider_order_id
             );
+
+            $payment->update([
+                'status' => PaymentStatus::CANCELED,
+            ]);
+
         }
 
         DB::transaction(function () use ($invoice, $newPaymentMethod) {
+
             $invoice->update([
                 'payment_method' => $newPaymentMethod,
                 'payment_status' => InvoicePaymentStatus::PAID,
@@ -46,7 +53,7 @@ class MarkAsPaidInvoiceAction
                 'user_id' => Auth::id(),
                 'provider' => PaymentProvider::MANUAL,
                 'amount' => $invoice->total_amount,
-                'status' => 'COMPLETED',
+                'status' => PaymentStatus::COMPLETED,
                 'paid_at' => now(),
             ]);
         });

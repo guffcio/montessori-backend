@@ -67,4 +67,15 @@ class InvoicePolicy
     {
         return false;
     }
+
+    /**
+     * Determine whether the user can create payments of model.
+     */
+    public function pay(User $user, Invoice $invoice): bool
+    {
+        return $invoice->child
+            ->parents()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
 }

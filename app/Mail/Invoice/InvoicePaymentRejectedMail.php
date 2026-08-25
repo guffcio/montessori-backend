@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Mail\InvoicePayment;
+namespace App\Mail\Invoice;
 
-use App\Models\InvoicePayment;
+use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoicePaymentCompletedMail extends Mailable
+class InvoicePaymentRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -18,7 +18,7 @@ class InvoicePaymentCompletedMail extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public InvoicePayment $invoicePayment
+        public Payment $payment
     ) {
         //
     }
@@ -29,7 +29,7 @@ class InvoicePaymentCompletedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Potwierdzenie otrzymania płatności',
+            subject: 'Informacja o odrzuceniu płatności',
         );
     }
 
@@ -39,7 +39,7 @@ class InvoicePaymentCompletedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.invoice-payment-completed',
+            markdown: 'emails.invoice-payment-rejected',
         );
     }
 

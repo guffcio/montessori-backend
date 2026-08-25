@@ -7,8 +7,9 @@ use App\Exceptions\InvoiceAlreadyUnpaidException;
 use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
-use App\Models\InvoicePayment;
+use App\Models\Payment;
 use App\PaymentProvider;
+use App\PaymentStatus;
 use Illuminate\Support\Facades\DB;
 
 class MarkAsUnpaidInvoiceAction
@@ -27,6 +28,7 @@ class MarkAsUnpaidInvoiceAction
         }
 
         DB::transaction(function () use ($invoice) {
+
             $invoice->update([
                 'payment_method' => null,
                 'payment_status' => InvoicePaymentStatus::UNPAID,
@@ -34,9 +36,9 @@ class MarkAsUnpaidInvoiceAction
 
             $invoice->payments()
                 ->where('provider', PaymentProvider::MANUAL)
-                ->each(function (InvoicePayment $invoicePayment) {
-                    $invoicePayment->update([
-                        'provider_status' => 'CANCELED',
+                ->each(function (Payment $payment) {
+                    $payment->update([
+                        'status' => PaymentStatus::CANCELED,
                     ]);
                 });
         });
