@@ -21,7 +21,9 @@ use App\InvoicePaymentMethod;
 use App\Models\Invoice;
 use App\Services\Invoice\InvoicePdfGenerator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPdf\PdfBuilder;
 
@@ -34,7 +36,13 @@ class InvoiceController extends Controller
     {
         Gate::authorize('viewAny', Invoice::class);
 
-        $invoices = Invoice::all();
+        $user = Auth::user();
+
+        if ($user->isParent()) {
+            $invoices = Invoice::forParent($user->parent)->get();
+        } else {
+            $invoices = Invoice::all();
+        }
 
         return InvoiceResource::collection($invoices);
     }
@@ -118,7 +126,7 @@ class InvoiceController extends Controller
      * Update the payment status in storage.
      */
     public function markAsUnpaid(
-        $request,
+        Request $request,
         Invoice $invoice,
         MarkAsUnpaidInvoiceAction $action
     ): InvoiceResource {
@@ -150,7 +158,7 @@ class InvoiceController extends Controller
     /**
      * Restore the specified resource from storage.
      */
-    public function restore(Invoice $invoice)
+    public function restore(Invoice $invoice): InvoiceResource
     {
         Gate::authorize('restore', $invoice);
 
@@ -159,8 +167,9 @@ class InvoiceController extends Controller
         }
 
         $invoice->restore();
+        $invoice->refresh();
 
-        return response()->noContent();
+        return new InvoiceResource($invoice);
     }
 
     /**
@@ -173,6 +182,8 @@ class InvoiceController extends Controller
         $dto = ReissueInvoiceData::fromArray($request->validated());
 
         $reissuedInvoice = $action->execute($invoice, $dto);
+
+        $reissuedInvoice->restore();
 
         return new InvoiceResource($reissuedInvoice);
     }

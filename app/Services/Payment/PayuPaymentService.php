@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services\Payment;
+
 use App\Data\Payment\PaymentCreateData;
 use App\Data\Payment\PaymentWebhookData;
 use App\Exceptions\PaymentCancellationException;
@@ -7,6 +9,9 @@ use App\Exceptions\PaymentCreateException;
 use App\Interfaces\PaymentServiceInterface;
 use App\PaymentProvider;
 use App\PayuPaymentStatus;
+use OpenPayU_Configuration;
+use OpenPayU_Exception;
+use OpenPayU_Order;
 
 class PayuPaymentService implements PaymentServiceInterface
 {

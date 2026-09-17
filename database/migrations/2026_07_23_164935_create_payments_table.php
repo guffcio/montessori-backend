@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->morphs('payable');
-            $table->foreignIdFor(User::class)->constrained()->onDelete('set null')->nullable();
+            $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('set null');
             $table->string('provider');
             $table->string('provider_order_id')->unique()->nullable();
             $table->decimal('amount', 10, 2);

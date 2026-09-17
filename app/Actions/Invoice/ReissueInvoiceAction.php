@@ -43,6 +43,7 @@ class ReissueInvoiceAction
 
             $invoice->update([
                 'billing_date' => $dto->billingDate->copy()->startOfMonth(),
+                'child_id' => $child->id,
                 'child_first_name' => $child->first_name,
                 'child_last_name' => $child->last_name,
                 'child_pesel' => $child->pesel,

@@ -12,12 +12,20 @@ class InvoicePolicy
         return $user->isAdmin() ? true : null;
     }
 
+    private function ownsInvoice(User $user, Invoice $invoice): bool
+    {
+        return $invoice->child
+            ->parents()
+            ->whereKey($user->parent->id)
+            ->exists();
+    }
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isParent();
     }
 
     /**
@@ -25,7 +33,7 @@ class InvoicePolicy
      */
     public function view(User $user, Invoice $invoice): bool
     {
-        return false;
+        return $this->ownsInvoice($user, $invoice);
     }
 
     /**

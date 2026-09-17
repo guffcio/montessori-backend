@@ -8,6 +8,7 @@ use App\InvoicePaymentStatus;
 use App\Policies\InvoicePolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -99,5 +100,12 @@ class Invoice extends Model
     public function advanceItems(): Collection
     {
         return $this->itemsByType(InvoiceItemType::ADVANCE);
+    }
+
+    public function scopeForParent(Builder $query, ParentUser $parent): Builder
+    {
+        return $query->whereHas('child.parents', function (Builder $query) use ($parent) {
+            $query->whereKey($parent->id);
+        });
     }
 }

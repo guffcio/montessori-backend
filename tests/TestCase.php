@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Models\Absence;
 use App\Models\Child;
+use App\Models\Invoice;
 use App\Models\Menu;
 use App\Models\Message;
 use App\Models\ParentUser;
@@ -62,6 +63,13 @@ abstract class TestCase extends BaseTestCase
         $message = Message::factory()->withRecipients(3, true)->create($data);
 
         return $message;
+    }
+
+    protected function createInvoice($data = []): Invoice
+    {
+        $invoice = Invoice::factory()->create($data);
+
+        return $invoice;
     }
 
     protected function actingAsAdmin(): User

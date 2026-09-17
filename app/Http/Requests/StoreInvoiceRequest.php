@@ -35,11 +35,11 @@ class StoreInvoiceRequest extends FormRequest
             'items.*.name' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'discounts' => ['required', 'array'],
+            'discounts' => ['sometimes', 'array'],
             'discounts.*.name' => ['required', 'string', 'max:255'],
             'discounts.*.quantity' => ['required', 'integer', 'min:1'],
             'discounts.*.price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'issue_date' => ['required', 'date', 'max:today'],
+            'issue_date' => ['required', 'date', 'before_or_equal:today'],
         ];
     }
 

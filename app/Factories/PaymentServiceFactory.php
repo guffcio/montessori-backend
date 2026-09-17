@@ -4,7 +4,7 @@ namespace App\Factories;
 
 use App\Interfaces\PaymentServiceInterface;
 use App\PaymentProvider;
-use PayuPaymentService;
+use App\Services\Payment\PayuPaymentService;
 
 class PaymentServiceFactory
 {
