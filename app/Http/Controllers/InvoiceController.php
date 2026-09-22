@@ -183,7 +183,6 @@ class InvoiceController extends Controller
         $dto = ReissueInvoiceData::fromArray($request->validated());
 
         $reissuedInvoice = $action->execute($invoice, $dto);
-
         $reissuedInvoice->restore();
 
         return new InvoiceResource($reissuedInvoice);

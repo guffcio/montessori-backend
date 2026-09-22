@@ -121,7 +121,7 @@ test('child must exist', function () {
     $invoice->delete();
 
     $response = $this->putJson("/api/invoices/{$invoice->id}/reissue", [
-        'child_id' => 1,
+        'child_id' => 999,
     ]);
 
     $response->assertStatus(422);

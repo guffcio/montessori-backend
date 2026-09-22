@@ -20,7 +20,6 @@ class ReissueInvoiceAction
 
     public function execute(Invoice $invoice, ReissueInvoiceData $dto): Invoice
     {
-
         if (! $invoice->canBeReissued()) {
             throw new InvoiceCannotBeReissuedException;
         }
