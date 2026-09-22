@@ -1,10 +1,14 @@
 <?php
 
+use App\Events\Payment\PaymentCompleted;
 use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Models\Invoice;
+use App\Notifications\Invoice\InvoicePaidNotification;
 use App\PaymentProvider;
 use App\PaymentStatus;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 
 test('admin can mark as paid invoice', function () {
     $this->actingAsAdmin();
@@ -118,4 +122,48 @@ test('rejects already paid invoice', function () {
 
     $response->assertStatus(422);
 
+});
+
+test('dispatch payment created event', function () {
+    Event::fake();
+
+    $this->actingAsAdmin();
+
+    $invoice = $this->createInvoice();
+
+    $response = $this->postJson("/api/invoices/{$invoice->id}/mark-as-paid", [
+        'payment_method' => InvoicePaymentMethod::CASH,
+    ]);
+
+    $response->assertStatus(200);
+
+    Event::assertDispatched(PaymentCompleted::class);
+});
+
+test('sends notifications', function () {
+    Notification::fake();
+    $this->actingAsAdmin();
+
+    $parent = $this->createParent();
+    $child = $this->createChild();
+
+    $child->parents()->sync($parent);
+    $invoice = $this->createInvoice([
+        'child_id' => $child->id,
+    ]);
+
+    $response = $this->postJson("/api/invoices/{$invoice->id}/mark-as-paid", [
+        'payment_method' => InvoicePaymentMethod::CASH,
+    ]);
+
+    $response->assertStatus(200);
+
+    Notification::assertSentTo(
+        $parent->user,
+        InvoicePaidNotification::class,
+        function ($notification, $channels) {
+            return in_array('mail', $channels)
+                && in_array('database', $channels);
+        }
+    );
 });

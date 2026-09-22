@@ -2,6 +2,7 @@
 
 namespace App\Actions\Invoice;
 
+use App\Events\Payment\PaymentCompleted;
 use App\Exceptions\Invoice\InvoiceAlreadyPaidException;
 use App\Factories\PaymentServiceFactory;
 use App\InvoicePaymentMethod;
@@ -42,14 +43,14 @@ class MarkAsPaidInvoiceAction
 
         }
 
-        DB::transaction(function () use ($invoice, $newPaymentMethod) {
+        $payment = DB::transaction(function () use ($invoice, $newPaymentMethod) {
 
             $invoice->update([
                 'payment_method' => $newPaymentMethod,
                 'payment_status' => InvoicePaymentStatus::PAID,
             ]);
 
-            $invoice->payments()->create([
+            return $invoice->payments()->create([
                 'user_id' => Auth::id(),
                 'provider' => PaymentProvider::MANUAL,
                 'amount' => $invoice->total_amount,
@@ -57,6 +58,8 @@ class MarkAsPaidInvoiceAction
                 'paid_at' => now(),
             ]);
         });
+
+        PaymentCompleted::dispatch($payment);
 
         return $invoice->fresh();
     }

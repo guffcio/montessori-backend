@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class InvoiceReadyNotification extends Notification implements ShouldQueue
+class InvoicePaymentCanceledNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -37,11 +37,8 @@ class InvoiceReadyNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nowa faktura z Przedszkola „Zaczarowany Ogród Montessori”')
-            ->markdown('emails.invoice-created', ['invoice' => $this->invoice])
-            ->attachFromStorageDisk('local', $this->invoice->pdf_path, "Faktura VAT {$this->invoice->number}.pdf", [
-                'mime' => 'application/pdf',
-            ]);
+            ->subject('Anulowano płatność')
+            ->markdown('emails.invoice-payment-canceled', ['invoice' => $this->invoice]);
     }
 
     /**
@@ -55,7 +52,7 @@ class InvoiceReadyNotification extends Notification implements ShouldQueue
             'type' => 'invoice',
             'content_id' => $this->invoice->id,
 
-            'title' => 'Nowa faktura',
+            'title' => 'Anulowano płatność za fakturę',
             'subtitle' => $this->invoice->number,
         ];
     }

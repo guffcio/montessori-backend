@@ -1,7 +1,7 @@
 <x-mail::message>
 Szanowni Państwo,
 
-informujemy, że płatność PayU za fakturę **{{$payment->payable->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”** została anulowana.
+informujemy, że płatność PayU za fakturę **{{$invoice->number}}** z Przedszkola **„Zaczarowany Ogród Montessori”** została anulowana.
 
 Jeżeli anulowanie było niezamierzone lub chcą Państwo ponowić płatność, prosimy o ponowne skorzystanie z panelu rodzica.
 
