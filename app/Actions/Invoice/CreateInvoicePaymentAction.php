@@ -7,13 +7,12 @@ use App\InvoicePaymentMethod;
 use App\InvoicePaymentStatus;
 use App\Mail\Invoice\InvoicePaymentCreatedMail;
 use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\User;
 use App\PaymentProvider;
 use App\PaymentStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CreateInvoicePaymentAction
 {
@@ -29,13 +28,13 @@ class CreateInvoicePaymentAction
 
         $order['description'] = "Płatność za fakturę {$invoice->number}";
         $order['totalAmount'] = $invoice->total_amount * 100;
-        $order['extOrderId'] = $invoice->id;
+        $order['extOrderId'] = (string) Str::uuid();
 
         $order['products'][0]['name'] = "Faktura VAT nr {$invoice->number}";
         $order['products'][0]['unitPrice'] = $invoice->total_amount * 100;
         $order['products'][0]['quantity'] = 1;
 
-        $user = User::auth();
+        $user = Auth::user();
         $order['buyer']['email'] = $user->email;
         $order['buyer']['phone'] = $user->phone;
         $order['buyer']['firstName'] = $user->parent->first_name;
@@ -45,11 +44,11 @@ class CreateInvoicePaymentAction
         $providerData = $paymentService->createPayment($order);
 
         $invoicePayment = DB::transaction(function () use ($provider, $invoice, $providerData) {
-            $invoicePayment = Payment::for($invoice)::create([
+            $invoicePayment = $invoice->payments()->create([
                 'user_id' => Auth::id(),
                 'provider' => $provider,
                 'provider_order_id' => $providerData->providerOrderId,
-                'payment_url' => $providerData->redirectUrl,
+                'payment_url' => $providerData->paymentUrl,
                 'amount' => $invoice->total_amount,
                 'status' => PaymentStatus::NEW,
             ]);
@@ -64,7 +63,7 @@ class CreateInvoicePaymentAction
 
         Mail::to(Auth::user())->send(new InvoicePaymentCreatedMail($invoicePayment));
 
-        return $invoicePayment->redirectUrl;
+        return $invoicePayment->payment_url;
 
     }
 }

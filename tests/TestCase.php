@@ -67,7 +67,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function createInvoice($data = []): Invoice
     {
-        $invoice = Invoice::factory()->create($data);
+        $invoice = Invoice::factory()->withItems(3)->create($data);
 
         return $invoice;
     }

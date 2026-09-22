@@ -7,8 +7,13 @@ use App\Models\User;
 
 class InvoicePolicy
 {
-    public function before(User $user): ?bool
+    public function before(User $user, string $ability): ?bool
     {
+
+        if ($ability === 'pay') {
+            return null;
+        }
+
         return $user->isAdmin() ? true : null;
     }
 
@@ -81,6 +86,11 @@ class InvoicePolicy
      */
     public function pay(User $user, Invoice $invoice): bool
     {
+
+        if ($user->isAdmin()) {
+            return false;
+        }
+
         return $invoice->child
             ->parents()
             ->where('user_id', $user->id)

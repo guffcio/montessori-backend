@@ -19,6 +19,7 @@ use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\InvoicePaymentMethod;
 use App\Models\Invoice;
+use App\PaymentProvider;
 use App\Services\Invoice\InvoicePdfGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -195,11 +196,11 @@ class InvoiceController extends Controller
     {
         Gate::authorize('pay', $invoice);
 
-        $redirectUrl = $action->execute($request->validated(), $invoice);
+        $paymentUrl = $action->execute(PaymentProvider::from($request->safe()->input('provider')), $invoice);
 
         return response()->json([
             'data' => [
-                'redirectUrl' => $redirectUrl,
+                'paymentUrl' => $paymentUrl,
             ],
         ]);
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable('invoice_id', 'user_id', 'provider', 'provider_order_id', 'amount', 'payment_url', 'status', 'provider_status', 'provider_response', 'paid_at')]
+#[Fillable('user_id', 'provider', 'provider_order_id', 'amount', 'payment_url', 'status', 'provider_status', 'provider_response', 'paid_at')]
 class Payment extends Model
 {
     protected function casts(): array

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('provider');
             $table->string('provider_order_id')->unique()->nullable();
             $table->decimal('amount', 10, 2);
-            $table->string('payment_url')->nullable();
+            $table->text('payment_url')->nullable();
             $table->string('status');
             $table->string('provider_status')->nullable();
             $table->json('provider_response')->nullable();

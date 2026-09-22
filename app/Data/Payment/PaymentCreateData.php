@@ -6,6 +6,6 @@ final readonly class PaymentCreateData
 {
     public function __construct(
         public string $providerOrderId,
-        public string $redirectUrl
+        public string $paymentUrl
     ) {}
 }

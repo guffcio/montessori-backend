@@ -23,7 +23,7 @@ class PayuPaymentService implements PaymentServiceInterface
         ]);
         $order['continueUrl'] = config('app.frontend_url').'/payment/success';
 
-        $order['customerIp'] = $_SERVER['REMOTE_ADDR'];
+        $order['customerIp'] = request()->ip() ?: '127.0.0.1';
         $order['merchantPosId'] = OpenPayU_Configuration::getOauthClientId() ? OpenPayU_Configuration::getOauthClientId() : OpenPayU_Configuration::getMerchantPosId();
         $order['currencyCode'] = 'PLN';
 
@@ -37,7 +37,7 @@ class PayuPaymentService implements PaymentServiceInterface
 
             return new PaymentCreateData(
                 providerOrderId: $response->getResponse()->orderId,
-                redirectUrl: $response->getResponse()->redirectUri
+                paymentUrl: $response->getResponse()->redirectUri
             );
         } catch (OpenPayU_Exception $e) {
             throw new PaymentCreateException(
