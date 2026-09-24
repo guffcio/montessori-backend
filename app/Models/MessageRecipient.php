@@ -9,9 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['message_id', 'user_id', 'read_at'])]
+
 class MessageRecipient extends Model
 {
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'read_at' => 'date',
+        ];
+    }
 
     public function message(): BelongsTo
     {
@@ -28,12 +36,13 @@ class MessageRecipient extends Model
         return $this->hasMany(MessageNotification::class);
     }
 
+    public function isRead(): bool
+    {
+        return $this->read_at !== null;
+    }
+
     public function markAsRead(): void
     {
-        if ($this->read_at !== null) {
-            return;
-        }
-
         $this->update([
             'read_at' => now(),
         ]);

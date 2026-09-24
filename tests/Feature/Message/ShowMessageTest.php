@@ -1,6 +1,11 @@
 <?php
 
+use App\Jobs\Message\SendRecipientReadMessageNotificationJob;
 use App\Models\Message;
+use App\Models\User;
+use App\Notifications\Message\RecipientReadMessageNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 
 test('admin can view message', function () {
     $this->actingAsAdmin();
@@ -99,5 +104,77 @@ test('already read message keeps original read_at', function () {
 
     $this->getJson("/api/messages/{$message->id}");
 
-    expect($recipient->fresh()->read_at)->toBe($read_at);
+    expect($read_at)->toEqual($read_at);
+});
+
+test('sends recipient read message notification to admins', function () {
+    Notification::fake();
+    $parent = $this->actingAsParent();
+    $message = $this->createMessage();
+
+    $message->recipients()->firstOrFail()->update([
+        'user_id' => $parent->user->id,
+    ]);
+
+    $response = $this->getJson("/api/messages/{$message->id}");
+
+    $response->assertStatus(200);
+
+    User::admins()
+        ->each(function (User $admin) {
+            Notification::assertSentTo($admin, RecipientReadMessageNotification::class);
+        });
+});
+
+test('dispatches send recipient read message job', function () {
+    Queue::fake();
+    $parent = $this->actingAsParent();
+    $message = $this->createMessage();
+
+    $message->recipients()->firstOrFail()->update([
+        'user_id' => $parent->user->id,
+    ]);
+
+    $response = $this->getJson("/api/messages/{$message->id}");
+
+    $response->assertStatus(200);
+
+    Queue::assertPushed(SendRecipientReadMessageNotificationJob::class);
+});
+
+test('does not send recipient read message notification to admins when message read already', function () {
+    Notification::fake();
+    $parent = $this->actingAsParent();
+    $message = $this->createMessage();
+
+    $message->recipients()->firstOrFail()->update([
+        'user_id' => $parent->user->id,
+        'read_at' => now(),
+    ]);
+
+    $response = $this->getJson("/api/messages/{$message->id}");
+
+    $response->assertStatus(200);
+
+    User::admins()
+        ->each(function (User $admin) {
+            Notification::assertNothingSent($admin, RecipientReadMessageNotification::class);
+        });
+});
+
+test('does not dispatch recipient read message notification job when message read already', function () {
+    Queue::fake();
+    $parent = $this->actingAsParent();
+    $message = $this->createMessage();
+
+    $message->recipients()->firstOrFail()->update([
+        'user_id' => $parent->user->id,
+        'read_at' => now(),
+    ]);
+
+    $response = $this->getJson("/api/messages/{$message->id}");
+
+    $response->assertStatus(200);
+
+    Queue::assertNothingPushed(SendRecipientReadMessageNotificationJob::class);
 });

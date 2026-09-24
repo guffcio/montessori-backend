@@ -10,6 +10,7 @@ use App\Http\Requests\MessageNotificationRequest;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Http\Resources\MessageResource;
+use App\Jobs\Message\SendRecipientReadMessageNotificationJob;
 use App\Models\Message;
 use App\Models\MessageRecipient;
 use Illuminate\Support\Facades\Auth;
@@ -59,7 +60,23 @@ class MessageController extends Controller
 
         Gate::authorize('view', $message);
 
-        $message->markAsReadFor(Auth::user());
+        $user = Auth::user();
+
+        if ($user->isParent()) {
+            $recipient = $message->recipients()
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($recipient && ! $recipient->isRead()) {
+                $recipient->markAsRead();
+
+                SendRecipientReadMessageNotificationJob::dispatch(
+                    $message->id,
+                    $recipient->id
+                );
+            }
+
+        }
 
         return new MessageResource($message);
     }

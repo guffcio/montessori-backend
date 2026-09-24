@@ -3,9 +3,10 @@
 namespace App\Notifications\Message;
 
 use App\Models\Message;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class NewMessageNotification extends Notification
+class NewMessageNotification extends Notification implements ShouldQueue
 {
     /**
      * Create a new notification instance.
