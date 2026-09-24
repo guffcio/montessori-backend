@@ -142,7 +142,7 @@ test('dispatch payment created event', function () {
 
 test('sends notifications', function () {
     Notification::fake();
-    $this->actingAsAdmin();
+    $admin = $this->actingAsAdmin();
 
     $parent = $this->createParent();
     $child = $this->createChild();
@@ -159,7 +159,7 @@ test('sends notifications', function () {
     $response->assertStatus(200);
 
     Notification::assertSentTo(
-        $parent->user,
+        [$parent->user, $admin],
         InvoicePaidNotification::class,
         function ($notification, $channels) {
             return in_array('mail', $channels)

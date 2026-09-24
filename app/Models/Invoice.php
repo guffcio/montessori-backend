@@ -108,4 +108,22 @@ class Invoice extends Model
             $query->whereKey($parent->id);
         });
     }
+
+    public function isOverdue(): bool
+    {
+        return $this->due_date->lt(today())
+          && $this->payment_status === InvoicePaymentStatus::UNPAID;
+    }
+
+    public function daysOverdue(): int
+    {
+        return $this->isOverdue()
+            ? $this->due_date->diffInDays(today())
+            : 0;
+    }
+
+    public function daysUntilDue(): int
+    {
+        return now()->diffInDays($this->due_date, false);
+    }
 }

@@ -6,7 +6,7 @@ informujemy, że rozpoczęli Państwo proces płatności za fakturę **{{$paymen
 Jeśli doszło do utraty połączenia, zamknięcia okna lub chcą Państwo po prostu ponowić płatność, mogą Państwo dokończyć ją, korzystając z poniższego przycisku:
 
 <x-mail::button class="button-init" :url="$payment->paymentUrl">
-Przejdź do wiadomości
+Przejdź do płatności
 </x-mail::button>
 
 Jeśli przycisk nie działa, skopiuj i otwórz poniższy adres w przeglądarce:
