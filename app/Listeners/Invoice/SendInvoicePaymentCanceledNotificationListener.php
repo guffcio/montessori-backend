@@ -7,7 +7,6 @@ use App\Models\Invoice;
 use App\Models\ParentUser;
 use App\Models\User;
 use App\Notifications\Invoice\InvoicePaymentCanceledNotification;
-use App\UserRole;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendInvoicePaymentCanceledNotificationListener implements ShouldQueue
@@ -42,9 +41,7 @@ class SendInvoicePaymentCanceledNotificationListener implements ShouldQueue
                 );
             });
 
-        User::query()
-            ->where('role', UserRole::ADMIN)
-            ->get()
+        User::admins()
             ->each(function (User $user) use ($payable) {
                 $user->notify(
                     new InvoicePaymentCanceledNotification($payable)
