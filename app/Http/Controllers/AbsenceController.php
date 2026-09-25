@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAbsenceRequest;
 use App\Http\Requests\UpdateAbsenceRequest;
 use App\Http\Resources\AbsenceResource;
+use App\Jobs\Absence\SendParentReportedAbsenceNotificationJob;
 use App\Models\Absence;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -42,6 +43,13 @@ class AbsenceController extends Controller
         $data['charge_catering'] = Absence::shouldChargeCatering($data['absent_at']);
 
         $absence = Absence::create($data);
+
+        if (Auth::user()->isParent()) {
+            SendParentReportedAbsenceNotificationJob::dispatch(
+                $absence->id,
+                Auth::user()->parent->id
+            );
+        }
 
         return new AbsenceResource($absence);
     }

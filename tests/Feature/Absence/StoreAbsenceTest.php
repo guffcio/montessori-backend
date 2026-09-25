@@ -1,5 +1,11 @@
 <?php
 
+use App\Jobs\Absence\SendParentReportedAbsenceNotificationJob;
+use App\Models\User;
+use App\Notifications\Absence\ParentReportedAbsenceNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
+
 test('admin can create absence', function () {
     $user = $this->actingAsAdmin();
     $child = $this->createChild();
@@ -190,4 +196,44 @@ test('data send properly to database', function () {
         'reported_by_user_id' => $user->id,
         'absent_at' => today()->nextWeekday()->toDateString(),
     ]);
+});
+
+test('sends parent reported absence notification to admins', function () {
+    Notification::fake();
+
+    $parent = $this->actingAsParent();
+    $child = $this->createChild();
+
+    $parent->children()->sync($child->id);
+
+    $response = $this->postJson('/api/absences', [
+        'child_id' => $child->id,
+        'reported_by_user_id' => $parent->user->id,
+        'absent_at' => today()->nextWeekday()->toDateString(),
+    ]);
+
+    $response->assertStatus(201);
+
+    User::admins()
+        ->each(function (User $admin) {
+            Notification::assertSentTo($admin, ParentReportedAbsenceNotification::class);
+        });
+});
+
+test('dispatches send parent reported absence notification job', function () {
+    Queue::fake();
+    $parent = $this->actingAsParent();
+    $child = $this->createChild();
+
+    $parent->children()->sync($child->id);
+
+    $response = $this->postJson('/api/absences', [
+        'child_id' => $child->id,
+        'reported_by_user_id' => $parent->user->id,
+        'absent_at' => today()->nextWeekday()->toDateString(),
+    ]);
+
+    $response->assertStatus(201);
+
+    Queue::assertPushed(SendParentReportedAbsenceNotificationJob::class);
 });
