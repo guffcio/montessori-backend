@@ -4,7 +4,7 @@ use App\Models\Child;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-test('admin can create parent', function () {
+test('admin can create parent', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/parents', [
@@ -34,7 +34,7 @@ test('admin can create parent', function () {
     ]);
 });
 
-test('parent cannot create parent', function () {
+test('parent cannot create parent', function (): void {
     $this->actingAsParent();
 
     $response = $this->postJson('/api/parents', [
@@ -52,7 +52,7 @@ test('parent cannot create parent', function () {
     $response->assertStatus(403);
 });
 
-test('guest cannot create parent', function () {
+test('guest cannot create parent', function (): void {
     $response = $this->postJson('/api/parents', [
         'first_name' => 'John',
         'last_name' => 'Smith',
@@ -68,7 +68,7 @@ test('guest cannot create parent', function () {
     $response->assertStatus(401);
 });
 
-test('validation email required', function () {
+test('validation email required', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/parents', [
@@ -86,7 +86,7 @@ test('validation email required', function () {
     $response->assertJsonValidationErrors('email');
 });
 
-test('validation email unique', function () {
+test('validation email unique', function (): void {
     $user = $this->actingAsAdmin();
 
     $response = $this->postJson('/api/parents', [
@@ -105,7 +105,7 @@ test('validation email unique', function () {
     $response->assertJsonValidationErrors('email');
 });
 
-test('password is hashed', function () {
+test('password is hashed', function (): void {
     $this->actingAsAdmin();
 
     $this->postJson('/api/parents', [
@@ -124,7 +124,7 @@ test('password is hashed', function () {
     expect(Hash::isHashed($parent->password))->toBeTrue();
 });
 
-test('user and parent are created', function () {
+test('user and parent are created', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/parents', [
@@ -152,7 +152,7 @@ test('user and parent are created', function () {
     ]);
 });
 
-test('admin can assign existing children when creating parent', function () {
+test('admin can assign existing children when creating parent', function (): void {
     $this->actingAsAdmin();
 
     $children = Child::factory()->count(5)->create();
@@ -184,7 +184,7 @@ test('admin can assign existing children when creating parent', function () {
 
 });
 
-test('admin cannot assign non existing children when creating parent', function () {
+test('admin cannot assign non existing children when creating parent', function (): void {
     $this->actingAsAdmin();
 
     $childrenIds = [1, 2, 3, 4, 5];

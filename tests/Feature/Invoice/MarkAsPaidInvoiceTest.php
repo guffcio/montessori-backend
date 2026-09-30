@@ -10,7 +10,7 @@ use App\PaymentStatus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 
-test('admin can mark as paid invoice', function () {
+test('admin can mark as paid invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -29,7 +29,7 @@ test('admin can mark as paid invoice', function () {
     ]);
 });
 
-test('parent cannot mark as paid invoice', function () {
+test('parent cannot mark as paid invoice', function (): void {
     $this->actingAsParent();
     $invoice = $this->createInvoice();
 
@@ -41,7 +41,7 @@ test('parent cannot mark as paid invoice', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $invoice = $this->createInvoice();
 
     $response = $this->postJson("/api/invoices/{$invoice->id}/mark-as-paid", [
@@ -52,7 +52,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates invoices table', function () {
+test('updates invoices table', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -70,7 +70,7 @@ test('updates invoices table', function () {
     ]);
 });
 
-test('adds new payment row', function () {
+test('adds new payment row', function (): void {
     $admin = $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -92,7 +92,7 @@ test('adds new payment row', function () {
 
 });
 
-test('allows just strict payment method type', function () {
+test('allows just strict payment method type', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -108,7 +108,7 @@ test('allows just strict payment method type', function () {
 
 });
 
-test('rejects already paid invoice', function () {
+test('rejects already paid invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([
@@ -124,7 +124,7 @@ test('rejects already paid invoice', function () {
 
 });
 
-test('dispatch payment created event', function () {
+test('dispatch payment created event', function (): void {
     Event::fake();
 
     $this->actingAsAdmin();
@@ -140,7 +140,7 @@ test('dispatch payment created event', function () {
     Event::assertDispatched(PaymentCompleted::class);
 });
 
-test('sends notifications', function () {
+test('sends notifications', function (): void {
     Notification::fake();
     $admin = $this->actingAsAdmin();
 

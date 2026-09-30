@@ -30,12 +30,12 @@ class SendUpcomingInvoiceReminderJob implements ShouldQueue
             ->where('payment_status', InvoicePaymentStatus::UNPAID)
             ->whereDate('due_date', today()->addDays(3))
             ->get()
-            ->each(function (Invoice $invoice) {
+            ->each(function (Invoice $invoice): void {
                 $invoice->child
                     ->parents()
                     ->with('user')
                     ->get()
-                    ->each(function (ParentUser $parent) use ($invoice) {
+                    ->each(function (ParentUser $parent) use ($invoice): void {
                         if (! $parent->user) {
                             return;
                         }

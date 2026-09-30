@@ -5,7 +5,7 @@ use App\Jobs\Invoice\SendOverdueInvoiceReminderJob;
 use App\Notifications\Invoice\OverdueInvoiceNotification;
 use Illuminate\Support\Facades\Notification;
 
-test('sends reminders when due date passed 3 days ago', function () {
+test('sends reminders when due date passed 3 days ago', function (): void {
     Notification::fake();
 
     $parent = $this->createParent();
@@ -28,7 +28,7 @@ test('sends reminders when due date passed 3 days ago', function () {
     );
 });
 
-test('sends reminders when due date is not passed 3 days ago', function () {
+test('sends reminders when due date is not passed 3 days ago', function (): void {
     Notification::fake();
 
     $parent = $this->createParent();
@@ -48,7 +48,7 @@ test('sends reminders when due date is not passed 3 days ago', function () {
     Notification::assertNothingSent();
 });
 
-test('does not send reminders when invoice payments status is not unpaid', function () {
+test('does not send reminders when invoice payments status is not unpaid', function (): void {
     Notification::fake();
 
     $parent = $this->createParent();

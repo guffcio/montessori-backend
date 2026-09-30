@@ -8,7 +8,7 @@ use App\Models\MessageRecipient;
 use App\Models\ParentUser;
 use Illuminate\Support\Facades\Queue;
 
-test('admin can update message', function () {
+test('admin can update message', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -28,7 +28,7 @@ test('admin can update message', function () {
     ]);
 });
 
-test('parent cannot update message', function () {
+test('parent cannot update message', function (): void {
     $this->actingAsParent();
     $message = $this->createMessage();
 
@@ -41,7 +41,7 @@ test('parent cannot update message', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $message = $this->createMessage();
 
     $response = $this->patchJson("/api/messages/{$message->id}", [
@@ -53,7 +53,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates messages table', function () {
+test('updates messages table', function (): void {
     $user = $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -72,7 +72,7 @@ test('updates messages table', function () {
     ]);
 });
 
-test('admin can update only strict fields', function () {
+test('admin can update only strict fields', function (): void {
     $user = $this->actingAsAdmin();
 
     $message = $this->createMessage([
@@ -95,7 +95,7 @@ test('admin can update only strict fields', function () {
 
 });
 
-test('adds new recipients', function () {
+test('adds new recipients', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -120,7 +120,7 @@ test('adds new recipients', function () {
     }
 });
 
-test('does not duplicate recipient', function () {
+test('does not duplicate recipient', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -145,7 +145,7 @@ test('does not duplicate recipient', function () {
     $response->assertJsonValidationErrors(['new_recipients.0']);
 });
 
-test('create message_notifications for new recipients', function () {
+test('create message_notifications for new recipients', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -165,7 +165,7 @@ test('create message_notifications for new recipients', function () {
 
     MessageRecipient::where('message_id', $message->id)
         ->whereIn('user_id', $newRecipientsIds)
-        ->each(function (MessageRecipient $recipient) {
+        ->each(function (MessageRecipient $recipient): void {
             $this->assertDatabaseHas('message_notifications', [
                 'message_recipient_id' => $recipient->id,
                 'channel' => MessageNotificationChannel::EMAIL,
@@ -176,7 +176,7 @@ test('create message_notifications for new recipients', function () {
 
 });
 
-test('does not duplicate message_notifications', function () {
+test('does not duplicate message_notifications', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -203,7 +203,7 @@ test('does not duplicate message_notifications', function () {
     }
 });
 
-test('send notification only to new recipients', function () {
+test('send notification only to new recipients', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -235,7 +235,7 @@ test('send notification only to new recipients', function () {
     }
 });
 
-test('dispatches job', function () {
+test('dispatches job', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -255,7 +255,7 @@ test('dispatches job', function () {
     $response->assertStatus(200);
 
     $newNotifications = MessageNotification::query()
-        ->whereHas('recipient', function ($query) use ($message, $newRecipientsIds) {
+        ->whereHas('recipient', function ($query) use ($message, $newRecipientsIds): void {
             $query->where('message_id', $message->id)
                 ->whereIn('user_id', $newRecipientsIds);
         })

@@ -2,7 +2,7 @@
 
 use App\InvoicePaymentStatus;
 
-test('admin can delete invoice', function () {
+test('admin can delete invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -11,7 +11,7 @@ test('admin can delete invoice', function () {
     $response->assertStatus(204);
 });
 
-test('parent cannot delete invoice', function () {
+test('parent cannot delete invoice', function (): void {
     $this->actingAsParent();
     $invoice = $this->createInvoice();
 
@@ -20,14 +20,14 @@ test('parent cannot delete invoice', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $invoice = $this->createInvoice();
     $response = $this->deleteJson("/api/invoices/{$invoice->id}");
     $response->assertStatus(401);
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('invoice is soft deleted', function () {
+test('invoice is soft deleted', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -38,7 +38,7 @@ test('invoice is soft deleted', function () {
     $this->assertSoftDeleted($invoice);
 });
 
-test('deleted invoice returns 404 on show', function () {
+test('deleted invoice returns 404 on show', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -50,7 +50,7 @@ test('deleted invoice returns 404 on show', function () {
     $response->assertStatus(404);
 });
 
-test('cannot delete already paid invoice', function () {
+test('cannot delete already paid invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([

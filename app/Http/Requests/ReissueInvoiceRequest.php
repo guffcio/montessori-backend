@@ -45,7 +45,7 @@ class ReissueInvoiceRequest extends FormRequest
     public function after(CalendarService $calendarService): array
     {
         return [
-            function (Validator $validator) use ($calendarService) {
+            function (Validator $validator) use ($calendarService): void {
                 /** @var Request $this */
                 if (
                     ! $this->filled('year_month') ||

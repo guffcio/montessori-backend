@@ -2,7 +2,7 @@
 
 use App\Models\Child;
 
-test('admin can update parent', function () {
+test('admin can update parent', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();
@@ -33,7 +33,7 @@ test('admin can update parent', function () {
     ]);
 });
 
-test('owner can update own data', function () {
+test('owner can update own data', function (): void {
     $parent = $this->actingAsParent();
 
     $response = $this->patchJson("/api/parents/{$parent->id}", [
@@ -62,7 +62,7 @@ test('owner can update own data', function () {
     ]);
 });
 
-test('parent cannot update another parent', function () {
+test('parent cannot update another parent', function (): void {
     $this->actingAsParent();
 
     $secondParent = $this->createParent();
@@ -82,7 +82,7 @@ test('parent cannot update another parent', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $parent = $this->createParent();
     $response = $this->patchJson("/api/parents/{$parent->id}", [
         'first_name' => 'John',
@@ -99,7 +99,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('validation email unique', function () {
+test('validation email unique', function (): void {
     $parent = $this->actingAsParent();
 
     $secondParent = $this->createParent();
@@ -119,7 +119,7 @@ test('validation email unique', function () {
     $response->assertJsonValidationErrors('email');
 });
 
-test('validation phone unique', function () {
+test('validation phone unique', function (): void {
     $parent = $this->actingAsParent();
 
     $secondParent = $this->createParent();
@@ -139,7 +139,7 @@ test('validation phone unique', function () {
     $response->assertJsonValidationErrors('phone');
 });
 
-test('updates user table', function () {
+test('updates user table', function (): void {
     $parent = $this->actingAsParent();
 
     $response = $this->patchJson("/api/parents/{$parent->id}", [
@@ -161,7 +161,7 @@ test('updates user table', function () {
     ]);
 });
 
-test('updates parent table', function () {
+test('updates parent table', function (): void {
     $parent = $this->actingAsParent();
 
     $response = $this->patchJson("/api/parents/{$parent->id}", [
@@ -187,7 +187,7 @@ test('updates parent table', function () {
     ]);
 });
 
-test('admin can replace assigned children', function () {
+test('admin can replace assigned children', function (): void {
     $this->actingAsAdmin();
     $parent = $this->createParent();
 
@@ -230,7 +230,7 @@ test('admin can replace assigned children', function () {
 
 });
 
-test('admin cannot assign non existing children', function () {
+test('admin cannot assign non existing children', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();
@@ -258,7 +258,7 @@ test('admin cannot assign non existing children', function () {
     $this->assertDatabaseCount('parent_child', 5);
 });
 
-test('parent cannot assign children', function () {
+test('parent cannot assign children', function (): void {
     $parent = $this->actingAsParent();
 
     $children = Child::factory()->count(5)->create();

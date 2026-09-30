@@ -2,7 +2,7 @@
 
 use App\Models\Invoice;
 
-test('admin can view invoice', function () {
+test('admin can view invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -13,7 +13,7 @@ test('admin can view invoice', function () {
 
 });
 
-test('parent can view own invoice', function () {
+test('parent can view own invoice', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -34,7 +34,7 @@ test('parent can view own invoice', function () {
 
 });
 
-test('parent cannot view another parent invoice', function () {
+test('parent cannot view another parent invoice', function (): void {
     $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -50,12 +50,12 @@ test('parent cannot view another parent invoice', function () {
     $response->assertStatus(403);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/invoices/1');
     $response->assertStatus(401);
 });
 
-test('return 404 for missing message', function () {
+test('return 404 for missing message', function (): void {
     $this->actingAsAdmin();
 
     $missingId = Invoice::max('id') + 1;

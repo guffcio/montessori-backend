@@ -35,7 +35,7 @@ class Message extends Model
 
     public function scopeForRecipient(Builder $query, User $user): Builder
     {
-        return $query->whereHas('recipients', function ($query) use ($user) {
+        return $query->whereHas('recipients', function ($query) use ($user): void {
             $query->where('user_id', $user->id);
         });
     }

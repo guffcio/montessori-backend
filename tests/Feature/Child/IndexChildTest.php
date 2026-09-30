@@ -3,7 +3,7 @@
 use App\Models\Child;
 use App\Models\ParentUser;
 
-test('admin can list children', function () {
+test('admin can list children', function (): void {
     $this->actingAsAdmin();
 
     Child::factory()->count(10)->create();
@@ -15,7 +15,7 @@ test('admin can list children', function () {
 
 });
 
-test('parent can list only own children', function () {
+test('parent can list only own children', function (): void {
     $parent = $this->actingAsParent();
 
     $otherParent = ParentUser::factory()->create();
@@ -37,7 +37,7 @@ test('parent can list only own children', function () {
         ->not->toContain(...$otherChildren->pluck('id'));
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/children');
 
     $response->assertStatus(401);

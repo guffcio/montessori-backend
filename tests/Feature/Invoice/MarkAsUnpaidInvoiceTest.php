@@ -6,7 +6,7 @@ use App\Models\Invoice;
 use App\PaymentProvider;
 use App\PaymentStatus;
 
-test('admin can mark as unpaid invoice', function () {
+test('admin can mark as unpaid invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([
@@ -26,7 +26,7 @@ test('admin can mark as unpaid invoice', function () {
     ]);
 });
 
-test('parent cannot mark as unpaid invoice', function () {
+test('parent cannot mark as unpaid invoice', function (): void {
     $this->actingAsParent();
     $invoice = $this->createInvoice([
         'payment_status' => InvoicePaymentStatus::PAID,
@@ -39,7 +39,7 @@ test('parent cannot mark as unpaid invoice', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $invoice = $this->createInvoice([
         'payment_status' => InvoicePaymentStatus::PAID,
     ]
@@ -51,7 +51,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates invoices table', function () {
+test('updates invoices table', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([
@@ -70,7 +70,7 @@ test('updates invoices table', function () {
     ]);
 });
 
-test('cancels manual payment row', function () {
+test('cancels manual payment row', function (): void {
     $admin = $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -93,7 +93,7 @@ test('cancels manual payment row', function () {
 
 });
 
-test('allows just strict payment method type', function () {
+test('allows just strict payment method type', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([
@@ -107,7 +107,7 @@ test('allows just strict payment method type', function () {
 
 });
 
-test('rejects already unpaid invoice', function () {
+test('rejects already unpaid invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice([

@@ -1,6 +1,6 @@
 <?php
 
-test('user can login', function () {
+test('user can login', function (): void {
 
     $response = $this->postJson('/api/login', [
         'email' => $this->createParent()->user->email,
@@ -10,7 +10,7 @@ test('user can login', function () {
     $response->assertStatus(200);
 });
 
-test('login fails with invalid password', function () {
+test('login fails with invalid password', function (): void {
 
     $response = $this->postJson('/api/login', [
         'email' => $this->createParent()->user->email,
@@ -20,7 +20,7 @@ test('login fails with invalid password', function () {
     $response->assertStatus(401);
 });
 
-test('login fails with unknown email', function () {
+test('login fails with unknown email', function (): void {
 
     $response = $this->postJson('/api/login', [
         'email' => 'user-fake@example.com',

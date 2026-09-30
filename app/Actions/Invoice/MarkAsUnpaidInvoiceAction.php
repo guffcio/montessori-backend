@@ -27,7 +27,7 @@ class MarkAsUnpaidInvoiceAction
             throw new CannotMarkOnlinePaymentAsUnpaidException;
         }
 
-        DB::transaction(function () use ($invoice) {
+        DB::transaction(function () use ($invoice): void {
 
             $invoice->update([
                 'payment_method' => null,
@@ -36,7 +36,7 @@ class MarkAsUnpaidInvoiceAction
 
             $invoice->payments()
                 ->where('provider', PaymentProvider::MANUAL)
-                ->each(function (Payment $payment) {
+                ->each(function (Payment $payment): void {
                     $payment->update([
                         'status' => PaymentStatus::CANCELED,
                     ]);

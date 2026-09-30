@@ -25,7 +25,7 @@ class ProcessPaymentWebhookAction
             return;
         }
 
-        DB::transaction(function () use ($paymentService, $data, $payment) {
+        DB::transaction(function () use ($paymentService, $data, $payment): void {
 
             $payment->update([
                 'status' => PaymentStatus::PENDING,

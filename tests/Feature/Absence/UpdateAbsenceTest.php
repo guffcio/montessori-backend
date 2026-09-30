@@ -1,6 +1,6 @@
 <?php
 
-test('admin can update absence', function () {
+test('admin can update absence', function (): void {
     $this->actingAsAdmin();
 
     $absence = $this->createAbsence([
@@ -23,7 +23,7 @@ test('admin can update absence', function () {
     ]);
 });
 
-test('parent cannot update own child absence', function () {
+test('parent cannot update own child absence', function (): void {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -43,7 +43,7 @@ test('parent cannot update own child absence', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('parent cannot update another child absence', function () {
+test('parent cannot update another child absence', function (): void {
     $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -64,7 +64,7 @@ test('parent cannot update another child absence', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $absence = $this->createAbsence();
     $response = $this->patchJson("/api/absences/{$absence->id}", [
         'charge_catering' => false,
@@ -74,7 +74,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates absence table', function () {
+test('updates absence table', function (): void {
     $this->actingAsAdmin();
 
     $absence = $this->createAbsence([
@@ -95,7 +95,7 @@ test('updates absence table', function () {
     ]);
 });
 
-test('admin can update only charge_catering field', function () {
+test('admin can update only charge_catering field', function (): void {
     $this->actingAsAdmin();
 
     $absence = $this->createAbsence([

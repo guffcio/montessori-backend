@@ -104,7 +104,7 @@ class Invoice extends Model
 
     public function scopeForParent(Builder $query, ParentUser $parent): Builder
     {
-        return $query->whereHas('child.parents', function (Builder $query) use ($parent) {
+        return $query->whereHas('child.parents', function (Builder $query) use ($parent): void {
             $query->whereKey($parent->id);
         });
     }

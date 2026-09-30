@@ -19,7 +19,7 @@ class NotifyMessageRecipientsAction
         $recipients
             ->loadMissing('user')
             ->where('read_at', null)
-            ->each(function (MessageRecipient $recipient) use ($message) {
+            ->each(function (MessageRecipient $recipient) use ($message): void {
                 $recipient->user->notify(new NewMessageNotification($message));
             });
     }

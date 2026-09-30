@@ -54,7 +54,7 @@ class CreateInvoiceAction
             ]);
 
             $child->parents
-                ->each(function (ParentUser $parent) use ($invoice) {
+                ->each(function (ParentUser $parent) use ($invoice): void {
                     $invoice->parentSnapshots()->create([
                         'first_name' => $parent->first_name,
                         'last_name' => $parent->last_name,

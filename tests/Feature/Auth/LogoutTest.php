@@ -1,6 +1,6 @@
 <?php
 
-test('authenticated user can logout', function () {
+test('authenticated user can logout', function (): void {
     $loginResponse = $this->postJson('/api/login', [
         'email' => $this->createParent()->user->email,
         'password' => $this->defaultPassword,
@@ -13,7 +13,7 @@ test('authenticated user can logout', function () {
     $logoutResponse->assertStatus(200);
 });
 
-test('guest cannot logout', function () {
+test('guest cannot logout', function (): void {
     $response = $this->postJson('/api/logout');
 
     $response->assertStatus(401);

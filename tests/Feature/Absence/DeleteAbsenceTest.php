@@ -1,6 +1,6 @@
 <?php
 
-test('admin can delete absence', function () {
+test('admin can delete absence', function (): void {
     $user = $this->actingAsAdmin();
 
     $absence = $this->createAbsence([
@@ -16,7 +16,7 @@ test('admin can delete absence', function () {
     ]);
 });
 
-test('parent can delete absence', function () {
+test('parent can delete absence', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -37,7 +37,7 @@ test('parent can delete absence', function () {
     ]);
 });
 
-test('parent cannot delete another parent child absence', function () {
+test('parent cannot delete another parent child absence', function (): void {
     $this->actingAsParent();
     $otherParent = $this->createParent();
 
@@ -55,7 +55,7 @@ test('parent cannot delete another parent child absence', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('parent cannot delete todays absence after 8:00 AM', function () {
+test('parent cannot delete todays absence after 8:00 AM', function (): void {
     $this->travelTo(now()->setDate(2026, 7, 31)->setTime(9, 0));
     $parent = $this->actingAsParent();
 
@@ -76,7 +76,7 @@ test('parent cannot delete todays absence after 8:00 AM', function () {
     ]);
 });
 
-test('parent cannot delete past absence', function () {
+test('parent cannot delete past absence', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -96,7 +96,7 @@ test('parent cannot delete past absence', function () {
     ]);
 });
 
-test('admin can delete todays absence after 8:00 AM', function () {
+test('admin can delete todays absence after 8:00 AM', function (): void {
     $this->travelTo(now()->setDate(2026, 7, 31)->setTime(9, 0));
     $user = $this->actingAsAdmin();
 
@@ -114,7 +114,7 @@ test('admin can delete todays absence after 8:00 AM', function () {
     ]);
 });
 
-test('admin can delete past absence', function () {
+test('admin can delete past absence', function (): void {
     $user = $this->actingAsAdmin();
 
     $absence = $this->createAbsence([
@@ -131,7 +131,7 @@ test('admin can delete past absence', function () {
     ]);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $absence = $this->createAbsence();
     $response = $this->deleteJson("/api/absences/{$absence->id}");
     $response->assertStatus(401);

@@ -48,7 +48,7 @@ Route::get('/', function () {
 //         ->format('a4');
 // });
 
-Route::get('/test-create-invoice', function (CreateInvoiceAction $action) {
+Route::get('/test-create-invoice', function (CreateInvoiceAction $action): void {
 
     $child = Child::factory()->create();
 

@@ -3,7 +3,7 @@
 use App\Models\Message;
 use App\Models\ParentUser;
 
-test('admin can list messages', function () {
+test('admin can list messages', function (): void {
     $this->actingAsAdmin();
 
     Message::factory()->count(10)->create();
@@ -15,7 +15,7 @@ test('admin can list messages', function () {
 
 });
 
-test('parent can list only own messages', function () {
+test('parent can list only own messages', function (): void {
     $parent = $this->actingAsParent();
 
     $otherParent = ParentUser::factory()->create();
@@ -23,13 +23,13 @@ test('parent can list only own messages', function () {
     $ownMessages = Message::factory()->withRecipients(5, true)->count(3)->create();
     $otherMessages = Message::factory()->withRecipients(5, true)->count(2)->create();
 
-    $ownMessages->each(function (Message $message) use ($parent) {
+    $ownMessages->each(function (Message $message) use ($parent): void {
         $message->recipients()->firstOrFail()->update([
             'user_id' => $parent->user->id,
         ]);
     });
 
-    $otherMessages->each(function (Message $message) use ($otherParent) {
+    $otherMessages->each(function (Message $message) use ($otherParent): void {
         $message->recipients()->firstOrFail()->update([
             'user_id' => $otherParent->user->id,
         ]);
@@ -46,7 +46,7 @@ test('parent can list only own messages', function () {
         ->not->toContain(...$otherMessages->pluck('id'));
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/messages');
 
     $response->assertStatus(401);

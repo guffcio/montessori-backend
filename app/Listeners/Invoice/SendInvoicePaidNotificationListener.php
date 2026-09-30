@@ -35,14 +35,14 @@ class SendInvoicePaidNotificationListener implements ShouldQueue
             ->parents()
             ->with('user')
             ->get()
-            ->each(function (ParentUser $parent) use ($payable) {
+            ->each(function (ParentUser $parent) use ($payable): void {
                 $parent->user->notify(
                     new InvoicePaidNotification($payable)
                 );
             });
 
         User::admins()
-            ->each(function (User $user) use ($payable) {
+            ->each(function (User $user) use ($payable): void {
                 $user->notify(
                     new InvoicePaidNotification($payable)
                 );

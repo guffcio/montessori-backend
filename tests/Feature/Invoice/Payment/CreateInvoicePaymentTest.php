@@ -10,7 +10,7 @@ use App\Services\Payment\PayuPaymentService;
 use Illuminate\Support\Facades\Mail;
 use Mockery\MockInterface;
 
-test('parent can create PayU own invoice payment', function () {
+test('parent can create PayU own invoice payment', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -21,7 +21,7 @@ test('parent can create PayU own invoice payment', function () {
         'child_id' => $child->id,
     ]);
 
-    $this->mock(PayuPaymentService::class, function (MockInterface $mock) {
+    $this->mock(PayuPaymentService::class, function (MockInterface $mock): void {
         $mock->expects('createPayment')
             ->once()
             ->andReturn(
@@ -40,7 +40,7 @@ test('parent can create PayU own invoice payment', function () {
 
 });
 
-test('admin cannot create PayU invoice payment', function () {
+test('admin cannot create PayU invoice payment', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();
@@ -62,7 +62,7 @@ test('admin cannot create PayU invoice payment', function () {
 
 });
 
-test('guest cannot create PayU invoice payment', function () {
+test('guest cannot create PayU invoice payment', function (): void {
     $parent = $this->createParent();
     $child = $this->createChild();
 
@@ -82,7 +82,7 @@ test('guest cannot create PayU invoice payment', function () {
 
 });
 
-test('required fields are validated', function () {
+test('required fields are validated', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -104,7 +104,7 @@ test('required fields are validated', function () {
 
 });
 
-test('invoice must exist', function () {
+test('invoice must exist', function (): void {
     $this->actingAsParent();
 
     $this->mock(PayuPaymentService::class);
@@ -114,7 +114,7 @@ test('invoice must exist', function () {
     $response->assertStatus(404);
 });
 
-test('creates payment', function () {
+test('creates payment', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -125,7 +125,7 @@ test('creates payment', function () {
         'child_id' => $child->id,
     ]);
 
-    $this->mock(PayuPaymentService::class, function (MockInterface $mock) {
+    $this->mock(PayuPaymentService::class, function (MockInterface $mock): void {
         $mock->expects('createPayment')
             ->once()
             ->andReturn(
@@ -155,7 +155,7 @@ test('creates payment', function () {
 
 });
 
-test('updates invoice', function () {
+test('updates invoice', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -166,7 +166,7 @@ test('updates invoice', function () {
         'child_id' => $child->id,
     ]);
 
-    $this->mock(PayuPaymentService::class, function (MockInterface $mock) {
+    $this->mock(PayuPaymentService::class, function (MockInterface $mock): void {
         $mock->expects('createPayment')
             ->once()
             ->andReturn(
@@ -189,7 +189,7 @@ test('updates invoice', function () {
 
 });
 
-test('send invoice payment created mail', function () {
+test('send invoice payment created mail', function (): void {
     Mail::fake();
     $parent = $this->actingAsParent();
 
@@ -201,7 +201,7 @@ test('send invoice payment created mail', function () {
         'child_id' => $child->id,
     ]);
 
-    $this->mock(PayuPaymentService::class, function (MockInterface $mock) {
+    $this->mock(PayuPaymentService::class, function (MockInterface $mock): void {
         $mock->expects('createPayment')
             ->once()
             ->andReturn(

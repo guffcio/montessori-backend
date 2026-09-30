@@ -34,7 +34,7 @@ class SendParentReportedAbsenceNotificationJob implements ShouldQueue
         $parent = ParentUser::findOrFail($this->parentId);
 
         User::admins()
-            ->each(function (User $admin) use ($absence, $parent) {
+            ->each(function (User $admin) use ($absence, $parent): void {
                 $admin->notify(new ParentReportedAbsenceNotification(
                     absence: $absence,
                     parent: $parent

@@ -2,7 +2,7 @@
 
 use App\Models\ParentUser;
 
-test('admin can list parents', function () {
+test('admin can list parents', function (): void {
     $this->actingAsAdmin();
 
     ParentUser::factory()->count(10)->create();
@@ -13,7 +13,7 @@ test('admin can list parents', function () {
     $response->assertStatus(200);
 });
 
-test('parent cannot list all parents', function () {
+test('parent cannot list all parents', function (): void {
     $this->actingAsParent();
 
     $response = $this->getJson('/api/parents');
@@ -21,7 +21,7 @@ test('parent cannot list all parents', function () {
     $response->assertStatus(403);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/parents');
 
     $response->assertStatus(401);

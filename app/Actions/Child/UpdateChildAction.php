@@ -24,7 +24,7 @@ class UpdateChildAction
             ]
         );
 
-        DB::transaction(function () use ($child, $childData, $data) {
+        DB::transaction(function () use ($child, $childData, $data): void {
 
             $child->update($childData);
 

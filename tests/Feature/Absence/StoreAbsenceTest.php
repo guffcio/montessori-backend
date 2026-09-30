@@ -6,7 +6,7 @@ use App\Notifications\Absence\ParentReportedAbsenceNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
-test('admin can create absence', function () {
+test('admin can create absence', function (): void {
     $user = $this->actingAsAdmin();
     $child = $this->createChild();
 
@@ -27,7 +27,7 @@ test('admin can create absence', function () {
     ]);
 });
 
-test('parent can create own child absence', function () {
+test('parent can create own child absence', function (): void {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -50,7 +50,7 @@ test('parent can create own child absence', function () {
     ]);
 });
 
-test('parent cannot create other parent child absence', function () {
+test('parent cannot create other parent child absence', function (): void {
     $parent = $this->actingAsParent();
 
     $otherParent = $this->createParent();
@@ -67,7 +67,7 @@ test('parent cannot create other parent child absence', function () {
     $response->assertStatus(403);
 });
 
-test('guest cannot create absence', function () {
+test('guest cannot create absence', function (): void {
     $parent = $this->createParent();
     $child = $this->createChild();
 
@@ -80,7 +80,7 @@ test('guest cannot create absence', function () {
     $response->assertStatus(401);
 });
 
-test('required fields are validated', function () {
+test('required fields are validated', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/absences', []);
@@ -93,7 +93,7 @@ test('required fields are validated', function () {
     ]);
 });
 
-test('child must exist', function () {
+test('child must exist', function (): void {
     $user = $this->actingAsAdmin();
 
     $response = $this->postJson('/api/absences', [
@@ -106,7 +106,7 @@ test('child must exist', function () {
     $response->assertJsonValidationErrors(['child_id']);
 });
 
-test('user who reported absence must exist', function () {
+test('user who reported absence must exist', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -121,7 +121,7 @@ test('user who reported absence must exist', function () {
     $response->assertJsonValidationErrors(['reported_by_user_id']);
 });
 
-test('should charge catering when absence is today and was created after 8:00AM or later', function () {
+test('should charge catering when absence is today and was created after 8:00AM or later', function (): void {
     $this->travelTo(now()->setDate(2026, 7, 31)->setTime(9, 0));
 
     $child = $this->createChild();
@@ -141,7 +141,7 @@ test('should charge catering when absence is today and was created after 8:00AM 
     ]);
 });
 
-test('should not charge catering when absence is today and was created before 8:00AM', function () {
+test('should not charge catering when absence is today and was created before 8:00AM', function (): void {
     $this->travelTo(now()->setDate(2026, 7, 31)->setTime(7, 0));
 
     $child = $this->createChild();
@@ -161,7 +161,7 @@ test('should not charge catering when absence is today and was created before 8:
     ]);
 });
 
-test('should not charge catering when absence is in future', function () {
+test('should not charge catering when absence is in future', function (): void {
     $child = $this->createChild();
     $user = $this->actingAsAdmin();
 
@@ -179,7 +179,7 @@ test('should not charge catering when absence is in future', function () {
     ]);
 });
 
-test('data send properly to database', function () {
+test('data send properly to database', function (): void {
     $child = $this->createChild();
     $user = $this->actingAsAdmin();
 
@@ -198,7 +198,7 @@ test('data send properly to database', function () {
     ]);
 });
 
-test('sends parent reported absence notification to admins', function () {
+test('sends parent reported absence notification to admins', function (): void {
     Notification::fake();
 
     $parent = $this->actingAsParent();
@@ -215,12 +215,12 @@ test('sends parent reported absence notification to admins', function () {
     $response->assertStatus(201);
 
     User::admins()
-        ->each(function (User $admin) {
+        ->each(function (User $admin): void {
             Notification::assertSentTo($admin, ParentReportedAbsenceNotification::class);
         });
 });
 
-test('dispatches send parent reported absence notification job', function () {
+test('dispatches send parent reported absence notification job', function (): void {
     Queue::fake();
     $parent = $this->actingAsParent();
     $child = $this->createChild();

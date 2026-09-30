@@ -1,6 +1,6 @@
 <?php
 
-test('admin can update menu', function () {
+test('admin can update menu', function (): void {
     $this->actingAsAdmin();
 
     $menu = $this->createMenu();
@@ -19,7 +19,7 @@ test('admin can update menu', function () {
     ]);
 });
 
-test('parent cannot update menu', function () {
+test('parent cannot update menu', function (): void {
     $this->actingAsParent();
 
     $menu = $this->createMenu();
@@ -33,7 +33,7 @@ test('parent cannot update menu', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $menu = $this->createMenu();
     $response = $this->patchJson("/api/menus/{$menu->id}", [
         'menu_date' => $menu->menu_date->nextWeekday(),
@@ -44,7 +44,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates menus table', function () {
+test('updates menus table', function (): void {
     $this->actingAsAdmin();
 
     $menu = $this->createMenu();
@@ -62,7 +62,7 @@ test('updates menus table', function () {
     ]);
 });
 
-test('can update menu with the same date as itself', function () {
+test('can update menu with the same date as itself', function (): void {
     $this->actingAsAdmin();
 
     $menu = $this->createMenu();
@@ -81,7 +81,7 @@ test('can update menu with the same date as itself', function () {
     ]);
 });
 
-test('cannot update menu with the same date as other', function () {
+test('cannot update menu with the same date as other', function (): void {
     $this->actingAsAdmin();
 
     $menu = $this->createMenu();

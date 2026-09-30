@@ -7,7 +7,7 @@ use App\Notifications\Message\RecipientReadMessageNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
-test('admin can view message', function () {
+test('admin can view message', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -18,7 +18,7 @@ test('admin can view message', function () {
 
 });
 
-test('parent can view own message', function () {
+test('parent can view own message', function (): void {
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
 
@@ -37,7 +37,7 @@ test('parent can view own message', function () {
 
 });
 
-test('parent cannot view another parent message', function () {
+test('parent cannot view another parent message', function (): void {
     $parent = $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -57,12 +57,12 @@ test('parent cannot view another parent message', function () {
     $response->assertStatus(403);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/messages/1');
     $response->assertStatus(401);
 });
 
-test('return 404 for missing message', function () {
+test('return 404 for missing message', function (): void {
     $this->actingAsAdmin();
 
     $missingId = Message::max('id') + 1;
@@ -71,7 +71,7 @@ test('return 404 for missing message', function () {
     $response->assertStatus(404);
 });
 
-test('recipient is marked as read', function () {
+test('recipient is marked as read', function (): void {
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
 
@@ -88,7 +88,7 @@ test('recipient is marked as read', function () {
     expect($recipient->fresh()->read_at)->not->toBeNull();
 });
 
-test('already read message keeps original read_at', function () {
+test('already read message keeps original read_at', function (): void {
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
 
@@ -107,7 +107,7 @@ test('already read message keeps original read_at', function () {
     expect($read_at)->toEqual($read_at);
 });
 
-test('sends recipient read message notification to admins', function () {
+test('sends recipient read message notification to admins', function (): void {
     Notification::fake();
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
@@ -121,12 +121,12 @@ test('sends recipient read message notification to admins', function () {
     $response->assertStatus(200);
 
     User::admins()
-        ->each(function (User $admin) {
+        ->each(function (User $admin): void {
             Notification::assertSentTo($admin, RecipientReadMessageNotification::class);
         });
 });
 
-test('dispatches send recipient read message job', function () {
+test('dispatches send recipient read message job', function (): void {
     Queue::fake();
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
@@ -142,7 +142,7 @@ test('dispatches send recipient read message job', function () {
     Queue::assertPushed(SendRecipientReadMessageNotificationJob::class);
 });
 
-test('does not send recipient read message notification to admins when message read already', function () {
+test('does not send recipient read message notification to admins when message read already', function (): void {
     Notification::fake();
     $parent = $this->actingAsParent();
     $message = $this->createMessage();
@@ -157,12 +157,12 @@ test('does not send recipient read message notification to admins when message r
     $response->assertStatus(200);
 
     User::admins()
-        ->each(function (User $admin) {
+        ->each(function (User $admin): void {
             Notification::assertNothingSent($admin, RecipientReadMessageNotification::class);
         });
 });
 
-test('does not dispatch recipient read message notification job when message read already', function () {
+test('does not dispatch recipient read message notification job when message read already', function (): void {
     Queue::fake();
     $parent = $this->actingAsParent();
     $message = $this->createMessage();

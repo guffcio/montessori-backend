@@ -1,6 +1,6 @@
 <?php
 
-test('admin can delete parent', function () {
+test('admin can delete parent', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();
@@ -9,7 +9,7 @@ test('admin can delete parent', function () {
     $response->assertStatus(204);
 });
 
-test('owner cannot delete own account', function () {
+test('owner cannot delete own account', function (): void {
     $parent = $this->actingAsParent();
 
     $response = $this->deleteJson("/api/parents/{$parent->id}");
@@ -17,7 +17,7 @@ test('owner cannot delete own account', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('parent cannot delete another parent', function () {
+test('parent cannot delete another parent', function (): void {
     $this->actingAsParent();
 
     $parent = $this->createParent();
@@ -27,14 +27,14 @@ test('parent cannot delete another parent', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $parent = $this->createParent();
     $response = $this->deleteJson("/api/parents/{$parent->id}");
     $response->assertStatus(401);
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('parent is soft deleted', function () {
+test('parent is soft deleted', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();

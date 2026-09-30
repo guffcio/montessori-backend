@@ -5,7 +5,7 @@ use App\Models\Child;
 use App\Models\ParentUser;
 use App\Models\Zone;
 
-test('admin can create child', function () {
+test('admin can create child', function (): void {
     $this->actingAsAdmin();
 
     $zone = Zone::factory()->create();
@@ -32,7 +32,7 @@ test('admin can create child', function () {
     ]);
 });
 
-test('parent cannot create child', function () {
+test('parent cannot create child', function (): void {
     $this->actingAsParent();
 
     $zone = Zone::factory()->create();
@@ -49,7 +49,7 @@ test('parent cannot create child', function () {
     $response->assertStatus(403);
 });
 
-test('guest cannot create child', function () {
+test('guest cannot create child', function (): void {
     $zone = Zone::factory()->create();
 
     $response = $this->postJson('/api/children', [
@@ -64,7 +64,7 @@ test('guest cannot create child', function () {
     $response->assertStatus(401);
 });
 
-test('required fields are validated', function () {
+test('required fields are validated', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/children', []);
@@ -80,7 +80,7 @@ test('required fields are validated', function () {
     ]);
 });
 
-test('pesel must be unique', function () {
+test('pesel must be unique', function (): void {
     $this->actingAsAdmin();
 
     $zone = Zone::factory()->create();
@@ -100,7 +100,7 @@ test('pesel must be unique', function () {
     $response->assertJsonValidationErrors(['pesel']);
 });
 
-test('zone must exist', function () {
+test('zone must exist', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/children', [
@@ -116,7 +116,7 @@ test('zone must exist', function () {
     $response->assertJsonValidationErrors(['zone_id']);
 });
 
-test('pesel must have exactly 11 digits', function () {
+test('pesel must have exactly 11 digits', function (): void {
     $this->actingAsAdmin();
 
     $zone = Zone::factory()->create();
@@ -134,7 +134,7 @@ test('pesel must have exactly 11 digits', function () {
     $response->assertJsonValidationErrors(['pesel']);
 });
 
-test('admin can assign existing parents when creating child', function () {
+test('admin can assign existing parents when creating child', function (): void {
 
     $this->actingAsAdmin();
 
@@ -166,7 +166,7 @@ test('admin can assign existing parents when creating child', function () {
 
 });
 
-test('admin cannot assign non existing parents when creating child', function () {
+test('admin cannot assign non existing parents when creating child', function (): void {
     $this->actingAsAdmin();
 
     $parentIds = [1, 2, 3, 4, 5];
@@ -188,7 +188,7 @@ test('admin cannot assign non existing parents when creating child', function ()
     $this->assertDatabaseCount('parent_child', 0);
 });
 
-test('admin can assign existing allergens when creating child', function () {
+test('admin can assign existing allergens when creating child', function (): void {
 
     $this->actingAsAdmin();
 
@@ -220,7 +220,7 @@ test('admin can assign existing allergens when creating child', function () {
 
 });
 
-test('admin cannot assign non existing allergens when creating child', function () {
+test('admin cannot assign non existing allergens when creating child', function (): void {
     $this->actingAsAdmin();
 
     $allergenIds = [1, 2, 3, 4, 5];

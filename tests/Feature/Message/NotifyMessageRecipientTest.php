@@ -6,7 +6,7 @@ use App\MessageNotificationStatus;
 use App\Models\MessageNotification;
 use Illuminate\Support\Facades\Queue;
 
-test('admin can notify recipient', function () {
+test('admin can notify recipient', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -28,7 +28,7 @@ test('admin can notify recipient', function () {
     ]);
 });
 
-test('parent cannot notify recipient', function () {
+test('parent cannot notify recipient', function (): void {
     $this->actingAsParent();
 
     $message = $this->createMessage();
@@ -42,7 +42,7 @@ test('parent cannot notify recipient', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $message = $this->createMessage();
     $recipient = $message->recipients()->firstOrFail();
 
@@ -54,7 +54,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates message_notifications table', function () {
+test('updates message_notifications table', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -81,7 +81,7 @@ test('updates message_notifications table', function () {
     ]);
 });
 
-test('recipient must belong to message', function () {
+test('recipient must belong to message', function (): void {
     $this->actingAsAdmin();
 
     $message = $this->createMessage();
@@ -97,7 +97,7 @@ test('recipient must belong to message', function () {
 
 });
 
-test('dispatches send notification job', function () {
+test('dispatches send notification job', function (): void {
 
     Queue::fake();
 
@@ -127,7 +127,7 @@ test('dispatches send notification job', function () {
     );
 });
 
-test('skips channel notified within last 24 hours', function () {
+test('skips channel notified within last 24 hours', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -161,7 +161,7 @@ test('skips channel notified within last 24 hours', function () {
     Queue::assertNotPushed(SendMessageNotificationJob::class);
 });
 
-test('allows notification after 24 hours', function () {
+test('allows notification after 24 hours', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();

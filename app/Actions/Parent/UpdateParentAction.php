@@ -33,7 +33,7 @@ class UpdateParentAction
             'postal_code',
         ]);
 
-        DB::transaction(function () use ($parentUser, $userData, $parentData, $data) {
+        DB::transaction(function () use ($parentUser, $userData, $parentData, $data): void {
             $parentUser->update($parentData);
             $parentUser->user()->update($userData);
 

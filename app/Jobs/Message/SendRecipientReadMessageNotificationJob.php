@@ -36,7 +36,7 @@ class SendRecipientReadMessageNotificationJob implements ShouldQueue
         $parent = $recipient->user->parent;
 
         User::admins()
-            ->each(function (User $admin) use ($message, $parent, $recipient) {
+            ->each(function (User $admin) use ($message, $parent, $recipient): void {
                 $admin->notify(
                     new RecipientReadMessageNotification(
                         message: $message,

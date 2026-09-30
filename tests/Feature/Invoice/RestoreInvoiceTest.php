@@ -1,6 +1,6 @@
 <?php
 
-test('admin can restore invoice', function () {
+test('admin can restore invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -10,7 +10,7 @@ test('admin can restore invoice', function () {
     $response->assertStatus(200);
 });
 
-test('parent cannot restore invoice', function () {
+test('parent cannot restore invoice', function (): void {
     $this->actingAsParent();
 
     $invoice = $this->createInvoice();
@@ -21,7 +21,7 @@ test('parent cannot restore invoice', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $invoice = $this->createInvoice();
     $invoice->delete();
 
@@ -30,7 +30,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('cannot restore not trashed invoice', function () {
+test('cannot restore not trashed invoice', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();

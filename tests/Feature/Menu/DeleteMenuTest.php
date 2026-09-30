@@ -1,6 +1,6 @@
 <?php
 
-test('admin can delete menu', function () {
+test('admin can delete menu', function (): void {
     $this->actingAsAdmin();
 
     $menu = $this->createMenu();
@@ -14,7 +14,7 @@ test('admin can delete menu', function () {
     ]);
 });
 
-test('parent cannot delete menu', function () {
+test('parent cannot delete menu', function (): void {
     $this->actingAsParent();
 
     $menu = $this->createMenu();
@@ -28,7 +28,7 @@ test('parent cannot delete menu', function () {
     ]);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $menu = $this->createMenu();
     $response = $this->deleteJson("/api/menus/{$menu->id}");
     $response->assertStatus(401);

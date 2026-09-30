@@ -2,7 +2,7 @@
 
 use App\Models\Absence;
 
-test('admin can view absence', function () {
+test('admin can view absence', function (): void {
     $this->actingAsAdmin();
 
     $absence = $this->createAbsence();
@@ -12,7 +12,7 @@ test('admin can view absence', function () {
 
 });
 
-test('parent can view own children absence', function () {
+test('parent can view own children absence', function (): void {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -34,7 +34,7 @@ test('parent can view own children absence', function () {
 
 });
 
-test('parent cannot view another parent child absence', function () {
+test('parent cannot view another parent child absence', function (): void {
     $this->actingAsParent();
 
     $secondParent = $this->createParent();
@@ -53,12 +53,12 @@ test('parent cannot view another parent child absence', function () {
     $response->assertStatus(403);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/absences/1');
     $response->assertStatus(401);
 });
 
-test('return 404 for missing absence', function () {
+test('return 404 for missing absence', function (): void {
     $this->actingAsAdmin();
 
     $missingId = Absence::max('id') + 1;

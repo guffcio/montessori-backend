@@ -2,7 +2,7 @@
 
 use App\Models\ParentUser;
 
-test('admin can view parent', function () {
+test('admin can view parent', function (): void {
     $this->actingAsAdmin();
 
     $parent = $this->createParent();
@@ -11,7 +11,7 @@ test('admin can view parent', function () {
     $response->assertStatus(200);
 
 });
-test('owner can view own parent', function () {
+test('owner can view own parent', function (): void {
     $parent = $this->actingAsParent();
 
     $response = $this->getJson("/api/parents/{$parent->id}");
@@ -25,7 +25,7 @@ test('owner can view own parent', function () {
     ]);
 
 });
-test('parent cannot view another parent', function () {
+test('parent cannot view another parent', function (): void {
     $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -33,11 +33,11 @@ test('parent cannot view another parent', function () {
 
     $response->assertStatus(403);
 });
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/parents/1');
     $response->assertStatus(401);
 });
-test('return 404 for missing parent', function () {
+test('return 404 for missing parent', function (): void {
     $this->actingAsAdmin();
 
     $missingId = ParentUser::max('id') + 1;

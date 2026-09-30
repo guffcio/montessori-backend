@@ -2,7 +2,7 @@
 
 use App\Models\Menu;
 
-test('admin can list all menus', function () {
+test('admin can list all menus', function (): void {
     $this->actingAsAdmin();
 
     Menu::factory()->count(10)->create();
@@ -14,7 +14,7 @@ test('admin can list all menus', function () {
 
 });
 
-test('parent can list all menus', function () {
+test('parent can list all menus', function (): void {
     $this->actingAsParent();
 
     Menu::factory()->count(10)->create();
@@ -26,7 +26,7 @@ test('parent can list all menus', function () {
 
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/menus');
 
     $response->assertStatus(401);

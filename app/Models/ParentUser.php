@@ -31,7 +31,7 @@ class ParentUser extends Model
 
     public function absences()
     {
-        return Absence::query()->whereHas('child.parents', function ($query) {
+        return Absence::query()->whereHas('child.parents', function ($query): void {
             $query->whereKey($this->id);
         });
     }

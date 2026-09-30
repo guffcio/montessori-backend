@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
-test('admin can reissue invoice', function () {
+test('admin can reissue invoice', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -45,7 +45,7 @@ test('admin can reissue invoice', function () {
     ]);
 });
 
-test('parent cannot reissue invoice', function () {
+test('parent cannot reissue invoice', function (): void {
     $this->actingAsParent();
 
     $child = $this->createChild();
@@ -71,7 +71,7 @@ test('parent cannot reissue invoice', function () {
     $response->assertStatus(403);
 });
 
-test('guest cannot reissue invoice', function () {
+test('guest cannot reissue invoice', function (): void {
 
     $child = $this->createChild();
 
@@ -96,7 +96,7 @@ test('guest cannot reissue invoice', function () {
     $response->assertStatus(401);
 });
 
-test('required fields are validated', function () {
+test('required fields are validated', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -114,7 +114,7 @@ test('required fields are validated', function () {
 
 });
 
-test('child must exist', function () {
+test('child must exist', function (): void {
     $this->actingAsAdmin();
 
     $invoice = $this->createInvoice();
@@ -128,7 +128,7 @@ test('child must exist', function () {
     $response->assertJsonValidationErrors(['child_id']);
 });
 
-test('reissues invoice', function () {
+test('reissues invoice', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -163,7 +163,7 @@ test('reissues invoice', function () {
 
 });
 
-test('creates items', function () {
+test('creates items', function (): void {
 
     $this->actingAsAdmin();
 
@@ -261,7 +261,7 @@ test('creates items', function () {
 
 });
 
-test('creates parent snaphots', function () {
+test('creates parent snaphots', function (): void {
 
     $this->actingAsAdmin();
 
@@ -318,7 +318,7 @@ test('creates parent snaphots', function () {
 
 });
 
-test('dispatch creates pdf', function () {
+test('dispatch creates pdf', function (): void {
     Queue::fake();
 
     $this->actingAsAdmin();
@@ -347,7 +347,7 @@ test('dispatch creates pdf', function () {
     Queue::assertPushed(GenerateInvoicePdfJob::class);
 });
 
-test('generates pdf', function () {
+test('generates pdf', function (): void {
 
     Storage::fake('local');
 
@@ -382,7 +382,7 @@ test('generates pdf', function () {
 
 });
 
-test('sends notifications', function () {
+test('sends notifications', function (): void {
     Notification::fake();
     $this->actingAsAdmin();
 
@@ -419,7 +419,7 @@ test('sends notifications', function () {
     );
 });
 
-test('cannot reissue already paid invoice', function () {
+test('cannot reissue already paid invoice', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -447,7 +447,7 @@ test('cannot reissue already paid invoice', function () {
     $response->assertStatus(422);
 });
 
-test('cannot reissue not trashed invoice', function () {
+test('cannot reissue not trashed invoice', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();

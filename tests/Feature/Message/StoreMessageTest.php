@@ -9,7 +9,7 @@ use App\Models\ParentUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Queue;
 
-test('admin can create message', function () {
+test('admin can create message', function (): void {
     $user = $this->actingAsAdmin();
 
     $recipients = ParentUser::factory()->count(5)->create();
@@ -40,7 +40,7 @@ test('admin can create message', function () {
         ->toEqualCanonicalizing($recipientsIds);
 });
 
-test('parent cannot create message', function () {
+test('parent cannot create message', function (): void {
     $parent = $this->actingAsParent();
 
     $recipients = ParentUser::factory()->count(5)->create();
@@ -57,7 +57,7 @@ test('parent cannot create message', function () {
     $response->assertStatus(403);
 });
 
-test('guest cannot create message', function () {
+test('guest cannot create message', function (): void {
 
     $user = User::factory()->create();
 
@@ -75,7 +75,7 @@ test('guest cannot create message', function () {
     $response->assertStatus(401);
 });
 
-test('required fields are validated', function () {
+test('required fields are validated', function (): void {
     $this->actingAsAdmin();
 
     $response = $this->postJson('/api/messages', []);
@@ -90,7 +90,7 @@ test('required fields are validated', function () {
 
 });
 
-test('recipient must exist', function () {
+test('recipient must exist', function (): void {
     $user = $this->actingAsAdmin();
 
     $response = $this->postJson('/api/messages', [
@@ -105,7 +105,7 @@ test('recipient must exist', function () {
     $response->assertJsonValidationErrors(['recipients.0', 'recipients.1', 'recipients.2', 'recipients.3']);
 });
 
-test('notification channel must be valid enum', function () {
+test('notification channel must be valid enum', function (): void {
     $user = $this->actingAsAdmin();
 
     $recipients = ParentUser::factory()->count(5)->create();
@@ -123,7 +123,7 @@ test('notification channel must be valid enum', function () {
     $response->assertJsonValidationErrors(['notification_channels.0']);
 });
 
-test('creates message', function () {
+test('creates message', function (): void {
     $user = $this->actingAsAdmin();
 
     $recipients = ParentUser::factory()->count(5)->create();
@@ -145,7 +145,7 @@ test('creates message', function () {
     ]);
 });
 
-test('creates recipients', function () {
+test('creates recipients', function (): void {
 
     $user = $this->actingAsAdmin();
 
@@ -172,7 +172,7 @@ test('creates recipients', function () {
 
 });
 
-test('creates message_notifications', function () {
+test('creates message_notifications', function (): void {
     Queue::fake();
 
     $user = $this->actingAsAdmin();
@@ -191,7 +191,7 @@ test('creates message_notifications', function () {
     $response->assertStatus(201);
 
     MessageRecipient::where('message_id', $response->json('data.id'))
-        ->each(function (MessageRecipient $recipient) {
+        ->each(function (MessageRecipient $recipient): void {
             $this->assertDatabaseHas('message_notifications', [
                 'message_recipient_id' => $recipient->id,
                 'channel' => MessageNotificationChannel::EMAIL,
@@ -201,7 +201,7 @@ test('creates message_notifications', function () {
         });
 });
 
-test('does not create message_notifications when channels are omitted', function () {
+test('does not create message_notifications when channels are omitted', function (): void {
 
     $user = $this->actingAsAdmin();
 
@@ -225,7 +225,7 @@ test('does not create message_notifications when channels are omitted', function
     }
 });
 
-test('creates database notifications', function () {
+test('creates database notifications', function (): void {
     $user = $this->actingAsAdmin();
 
     $recipients = ParentUser::factory()->count(5)->create();
@@ -249,7 +249,7 @@ test('creates database notifications', function () {
     }
 });
 
-test('dispatches SendMessageNotificationJob', function () {
+test('dispatches SendMessageNotificationJob', function (): void {
     Queue::fake();
     $user = $this->actingAsAdmin();
 

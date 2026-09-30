@@ -4,7 +4,7 @@ use App\Models\Allergen;
 use App\Models\ParentUser;
 use App\Models\Zone;
 
-test('admin can update child', function () {
+test('admin can update child', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -31,7 +31,7 @@ test('admin can update child', function () {
     ]);
 });
 
-test('parent can update own child', function () {
+test('parent can update own child', function (): void {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -57,7 +57,7 @@ test('parent can update own child', function () {
     ]);
 });
 
-test('parent cannot update another child', function () {
+test('parent cannot update another child', function (): void {
     $parent = $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -78,7 +78,7 @@ test('parent cannot update another child', function () {
     $response->assertJsonFragment(['This action is unauthorized.']);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $child = $this->createChild();
     $response = $this->patchJson("/api/children/{$child->id}", [
         'first_name' => 'Leo',
@@ -93,7 +93,7 @@ test('guest receives 401', function () {
     $response->assertJsonFragment(['Unauthenticated.']);
 });
 
-test('updates children table', function () {
+test('updates children table', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -119,7 +119,7 @@ test('updates children table', function () {
     ]);
 });
 
-test('admin can replace assigned parents', function () {
+test('admin can replace assigned parents', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -163,7 +163,7 @@ test('admin can replace assigned parents', function () {
 
 });
 
-test('admin cannot assign non existing parents', function () {
+test('admin cannot assign non existing parents', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -191,7 +191,7 @@ test('admin cannot assign non existing parents', function () {
     $this->assertDatabaseCount('parent_child', 5);
 });
 
-test('admin can remove all parents', function () {
+test('admin can remove all parents', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -224,7 +224,7 @@ test('admin can remove all parents', function () {
     $this->assertDatabaseCount('parent_child', 0);
 });
 
-test('parent can replace assigned allergens', function () {
+test('parent can replace assigned allergens', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -265,7 +265,7 @@ test('parent can replace assigned allergens', function () {
 
 });
 
-test('parent cannot assign non existing allergens', function () {
+test('parent cannot assign non existing allergens', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -292,7 +292,7 @@ test('parent cannot assign non existing allergens', function () {
     $this->assertDatabaseCount('allergen_child', 5);
 });
 
-test('parent can remove all allergens', function () {
+test('parent can remove all allergens', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -323,7 +323,7 @@ test('parent can remove all allergens', function () {
     $this->assertDatabaseCount('allergen_child', 0);
 });
 
-test('parent can update only strict fields', function () {
+test('parent can update only strict fields', function (): void {
     $parent = $this->actingAsParent();
 
     $child = $this->createChild();
@@ -360,7 +360,7 @@ test('parent can update only strict fields', function () {
 
 });
 
-test('child can keep current pesel', function () {
+test('child can keep current pesel', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -377,7 +377,7 @@ test('child can keep current pesel', function () {
     $response->assertStatus(200);
 });
 
-test('child cannot use another child pesel', function () {
+test('child cannot use another child pesel', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -396,7 +396,7 @@ test('child cannot use another child pesel', function () {
     $response->assertJsonValidationErrors(['pesel']);
 });
 
-test('zone must exist', function () {
+test('zone must exist', function (): void {
     $this->actingAsAdmin();
     $child = $this->createChild();
 

@@ -4,7 +4,7 @@ use App\Models\Absence;
 use App\Models\Child;
 use App\Models\ParentUser;
 
-test('admin can list all absences', function () {
+test('admin can list all absences', function (): void {
     $this->actingAsAdmin();
 
     Absence::factory()->count(10)->create();
@@ -16,7 +16,7 @@ test('admin can list all absences', function () {
 
 });
 
-test('parent can list only own children absences', function () {
+test('parent can list only own children absences', function (): void {
     $parent = $this->actingAsParent();
     $otherParent = ParentUser::factory()->create();
 
@@ -51,7 +51,7 @@ test('parent can list only own children absences', function () {
 
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/absences');
 
     $response->assertStatus(401);

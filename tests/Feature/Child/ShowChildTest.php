@@ -2,7 +2,7 @@
 
 use App\Models\Child;
 
-test('admin can view children', function () {
+test('admin can view children', function (): void {
     $this->actingAsAdmin();
 
     $child = $this->createChild();
@@ -12,7 +12,7 @@ test('admin can view children', function () {
 
 });
 
-test('parent can view own children', function () {
+test('parent can view own children', function (): void {
     $parent = $this->actingAsParent();
     $child = $this->createChild();
 
@@ -29,7 +29,7 @@ test('parent can view own children', function () {
 
 });
 
-test('parent cannot view another parent children', function () {
+test('parent cannot view another parent children', function (): void {
     $parent = $this->actingAsParent();
     $secondParent = $this->createParent();
 
@@ -44,12 +44,12 @@ test('parent cannot view another parent children', function () {
     $response->assertStatus(403);
 });
 
-test('guest receives 401', function () {
+test('guest receives 401', function (): void {
     $response = $this->getJson('/api/children/1');
     $response->assertStatus(401);
 });
 
-test('return 404 for missing children', function () {
+test('return 404 for missing children', function (): void {
     $this->actingAsAdmin();
 
     $missingId = Child::max('id') + 1;
